@@ -1,0 +1,20 @@
+/**
+ * @description Custom error class for API errors
+ * @extends Error
+ */
+class ApiError extends Error {
+  constructor(statusCode, message, isOperational = true, stack = "") {
+    super(message);
+    this.statusCode = statusCode;
+    this.isOperational = isOperational;
+    this.success = false;
+    
+    if (stack) {
+      this.stack = stack;
+    } else {
+      Error.captureStackTrace(this, this.constructor);
+    }
+  }
+}
+
+module.exports = ApiError;
