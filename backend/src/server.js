@@ -1,9 +1,6 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
 const app = require("./app");
-
-// Load environment variables
-dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/omnichannel_pos";

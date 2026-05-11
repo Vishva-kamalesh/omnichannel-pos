@@ -4,6 +4,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerJsdoc = require("swagger-jsdoc");
 const ApiError = require("./utils/ApiError");
 const authRoutes = require("./modules/auth/auth.routes");
+const productRoutes = require("./modules/products/product.routes");
 const sampleRoutes = require("./modules/inventory/sample.routes");
 
 const app = express();
@@ -51,6 +52,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/inventory", sampleRoutes);
 
 // Root route
