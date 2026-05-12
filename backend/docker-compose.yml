@@ -1,0 +1,46 @@
+services:
+  # Backend API Service
+  backend:
+    build: .
+    container_name: omnichannel-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - MONGO_URI=mongodb://mongodb:27017/omnichannel_pos
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=production_secret_key_123
+      - JWT_EXPIRES_IN=1d
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - pos-network
+
+  # MongoDB Service
+  mongodb:
+    image: mongo:latest
+    container_name: omnichannel-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - pos-network
+
+  # Redis Service
+  redis:
+    image: redis:alpine
+    container_name: omnichannel-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - pos-network
+
+networks:
+  pos-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
