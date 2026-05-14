@@ -6,6 +6,7 @@ const ApiError = require("./utils/ApiError");
 const authRoutes = require("./modules/auth/auth.routes");
 const productRoutes = require("./modules/products/product.routes");
 const inventoryRoutes = require("./modules/inventory/inventory.routes");
+const analyticsRoutes = require("./modules/analytics/analytics.routes");
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/inventory", inventoryRoutes);
+app.use("/api/v1/analytics", analyticsRoutes);
 
 // Root route
 app.get("/", (req, res) => {

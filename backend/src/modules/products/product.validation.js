@@ -32,7 +32,7 @@ const createProductSchema = Joi.object({
   ),
   variants: Joi.array().items(Joi.object().unknown(true)),
   storeId: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required().messages({
-    "string.pattern.base": "Invalid Store ID",
+    "string.pattern.base": "Store ID must be a valid 24-character hexadecimal MongoDB ObjectId",
   }),
   isActive: Joi.boolean().default(true),
 });
