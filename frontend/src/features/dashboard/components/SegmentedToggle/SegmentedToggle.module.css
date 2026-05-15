@@ -1,0 +1,27 @@
+.toggle {
+  display: inline-flex;
+  padding: 2px;
+  background-color: var(--color-bg-app);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.option {
+  padding: 4px 10px;
+  border-radius: calc(var(--radius-md) - 2px);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  transition: background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.option:hover {
+  color: var(--color-text-secondary);
+}
+
+.active {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-sm);
+}

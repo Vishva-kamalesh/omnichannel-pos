@@ -1,0 +1,42 @@
+.headline {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-1);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.total {
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.sub {
+  margin-top: 2px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.sideStat {
+  text-align: right;
+}
+
+.sideLabel {
+  display: block;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.sideValue {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
