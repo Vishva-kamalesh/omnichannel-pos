@@ -1,0 +1,110 @@
+.channels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.channelRow {
+  display: grid;
+  grid-template-columns: 1fr minmax(80px, 120px) 36px;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.channelMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.channelLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.channelAmount {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.barTrack {
+  height: 6px;
+  background-color: var(--color-bg-app);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: 999px;
+}
+
+.share {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.divider {
+  height: 1px;
+  margin: var(--space-4) 0;
+  background-color: var(--color-border);
+}
+
+.comparison {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-xs);
+}
+
+.comparison th {
+  padding: 0 0 var(--space-2);
+  text-align: right;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.comparison th:first-child {
+  text-align: left;
+}
+
+.comparison td {
+  padding: 6px 0;
+  text-align: right;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.comparison tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.metricName {
+  text-align: left !important;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary) !important;
+}
+
+.muted {
+  color: var(--color-text-muted) !important;
+}
+
+.change {
+  font-weight: var(--font-weight-medium);
+}
+
+.changeUp {
+  color: var(--color-success);
+}
+
+.changeDown {
+  color: var(--color-danger);
+}

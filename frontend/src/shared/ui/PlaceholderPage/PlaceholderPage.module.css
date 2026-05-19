@@ -1,0 +1,21 @@
+.card {
+  padding: var(--space-5);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.message {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-normal);
+}
+
+.message code {
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  background-color: var(--color-bg-app);
+  color: var(--color-text-primary);
+}
