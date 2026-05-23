@@ -1,6 +1,6 @@
 import { Minus, Plus, X } from 'lucide-react'
 import { formatINR } from '../../data/posMock'
-import { useCartStore, type CartLine } from '../../store/cartStore'
+import { MAX_LINE_QTY, useCartStore, type CartLine } from '../../store/cartStore'
 import styles from './CartLineItem.module.css'
 
 type CartLineItemProps = {
@@ -14,6 +14,7 @@ export function CartLineItem({ line }: CartLineItemProps) {
 
   const { product, quantity } = line
   const lineTotal = product.price * quantity
+  const atMax = quantity >= Math.min(product.stock, MAX_LINE_QTY)
   const taxLabel =
     product.taxRate === 0
       ? 'Tax exempt'
@@ -42,6 +43,7 @@ export function CartLineItem({ line }: CartLineItemProps) {
           type="button"
           className={styles.stepBtn}
           onClick={() => increment(product.id)}
+          disabled={atMax}
           aria-label={`Increase ${product.name} quantity`}
         >
           <Plus size={13} strokeWidth={2.5} />

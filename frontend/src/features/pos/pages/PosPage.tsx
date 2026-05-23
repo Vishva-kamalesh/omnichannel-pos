@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { CATEGORIES, POS_PRODUCTS, findProductByCode } from '../data/posMock'
 import { useCartStore } from '../store/cartStore'
-import type { Product } from '../types/pos.types'
+import type { ScanResult } from '../types/pos.types'
 import {
   CartPanel,
   CategoryFilter,
@@ -44,13 +44,17 @@ export function PosPage() {
     })
   }, [query, category])
 
-  function handleBarcode(code: string): Product | null {
+  function handleBarcode(code: string): ScanResult {
     const product = findProductByCode(code)
-    if (product && product.stock > 0) {
-      addProduct(product)
-      return product
-    }
-    return null
+    if (!product) return { status: 'not-found' }
+    // Block the scan when every available unit is already on the bill.
+    const inCart =
+      useCartStore
+        .getState()
+        .lines.find((l) => l.product.id === product.id)?.quantity ?? 0
+    if (inCart >= product.stock) return { status: 'out-of-stock', product }
+    addProduct(product)
+    return { status: 'added', product }
   }
 
   return (

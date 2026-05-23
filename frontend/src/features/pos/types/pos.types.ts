@@ -28,3 +28,9 @@ export type CategoryMeta = {
 }
 
 export type PaymentMethodId = 'cash' | 'card' | 'upi' | 'wallet'
+
+/** Outcome of resolving a scanned or typed code at the terminal. */
+export type ScanResult =
+  | { status: 'added'; product: Product }
+  | { status: 'out-of-stock'; product: Product }
+  | { status: 'not-found' }

@@ -27,7 +27,7 @@ export function CategoryFilter({
     <div className={styles.wrap}>
       <div
         className={styles.tabs}
-        role="tablist"
+        role="group"
         aria-label="Filter products by category"
       >
         {options.map((option) => {
@@ -36,8 +36,7 @@ export function CategoryFilter({
             <button
               key={option.id}
               type="button"
-              role="tab"
-              aria-selected={isActive}
+              aria-pressed={isActive}
               className={[styles.tab, isActive ? styles.tabActive : '']
                 .filter(Boolean)
                 .join(' ')}
