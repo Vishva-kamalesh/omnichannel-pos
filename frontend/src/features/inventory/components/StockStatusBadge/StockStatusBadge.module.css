@@ -1,0 +1,45 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.inStock {
+  color: #166534;
+  background-color: #ecfdf5;
+}
+
+.inStock .dot {
+  background-color: #16a34a;
+}
+
+.lowStock {
+  color: #9a3412;
+  background-color: #fff7ed;
+}
+
+.lowStock .dot {
+  background-color: #f59e0b;
+}
+
+.outOfStock {
+  color: #991b1b;
+  background-color: #fef2f2;
+}
+
+.outOfStock .dot {
+  background-color: #ef4444;
+}
