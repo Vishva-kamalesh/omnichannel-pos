@@ -56,9 +56,14 @@
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
 }
 
-.stepBtn:hover {
+.stepBtn:hover:not(:disabled) {
   background-color: var(--color-bg-app);
   color: var(--color-text-primary);
+}
+
+.stepBtn:disabled {
+  color: var(--color-border-strong);
+  cursor: not-allowed;
 }
 
 .qty {

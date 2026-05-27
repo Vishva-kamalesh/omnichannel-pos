@@ -1,0 +1,106 @@
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg-surface);
+  flex-wrap: wrap;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.sizeLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.sizeSelect {
+  height: 28px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-surface);
+  cursor: pointer;
+}
+
+.sizeSelect:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.range {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.pageInfo {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.btnGroup {
+  display: inline-flex;
+}
+
+.pageBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-surface);
+  transition: background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.pageBtn:not(:last-child) {
+  border-right: none;
+}
+
+.pageBtn:first-child {
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.pageBtn:last-child {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.pageBtn:hover:not(:disabled) {
+  background-color: var(--color-bg-app);
+  color: var(--color-text-primary);
+}
+
+.pageBtn:disabled {
+  color: var(--color-border-strong);
+  cursor: not-allowed;
+}
+
+@media (max-width: 560px) {
+  .bar {
+    justify-content: center;
+  }
+}

@@ -1,0 +1,159 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.scroll {
+  overflow: auto;
+  max-height: 596px;
+}
+
+.table {
+  width: 100%;
+  min-width: 1080px;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+/* Sticky header — box-shadow keeps the divider visible while scrolling. */
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0;
+  text-align: left;
+  background-color: #fafbfc;
+  box-shadow: inset 0 -1px 0 var(--color-border);
+  white-space: nowrap;
+}
+
+.sortButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast);
+}
+
+.sortButton:hover {
+  color: var(--color-text-secondary);
+}
+
+.thNumeric .sortButton {
+  justify-content: flex-end;
+}
+
+.sortIdle {
+  opacity: 0;
+  color: var(--color-text-muted);
+  transition: opacity var(--transition-fast);
+}
+
+.sortButton:hover .sortIdle {
+  opacity: 1;
+}
+
+.sortActive {
+  color: var(--color-primary);
+}
+
+.table td {
+  padding: 10px var(--space-4);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover td {
+  background-color: #fafbfc;
+}
+
+.tdNumeric {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.product {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.productName {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.sku {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.category {
+  color: var(--color-text-secondary);
+}
+
+.location {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.locationName {
+  color: var(--color-text-primary);
+}
+
+.locationMeta {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.num {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.numMuted {
+  color: var(--color-text-muted);
+}
+
+.numDanger {
+  color: var(--color-danger);
+}
+
+.table td.emptyCell {
+  padding: var(--space-8) var(--space-4);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.emptyTitle {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.emptyHint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}

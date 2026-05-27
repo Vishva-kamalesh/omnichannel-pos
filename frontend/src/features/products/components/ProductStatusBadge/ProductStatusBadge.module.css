@@ -1,0 +1,45 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.active {
+  color: #166534;
+  background-color: #ecfdf5;
+}
+
+.active .dot {
+  background-color: #16a34a;
+}
+
+.draft {
+  color: #92400e;
+  background-color: #fffbeb;
+}
+
+.draft .dot {
+  background-color: #f59e0b;
+}
+
+.archived {
+  color: #475569;
+  background-color: #f1f5f9;
+}
+
+.archived .dot {
+  background-color: #94a3b8;
+}

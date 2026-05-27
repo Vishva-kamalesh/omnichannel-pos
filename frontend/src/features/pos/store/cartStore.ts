@@ -29,12 +29,15 @@ export const useCartStore = create<CartState>((set) => ({
 
   addProduct: (product) =>
     set((state) => {
+      // Never let a line exceed on-hand stock (or the hard line cap).
+      const ceiling = Math.min(product.stock, MAX_LINE_QTY)
+      if (ceiling < 1) return state
       const existing = state.lines.find((l) => l.product.id === product.id)
       if (existing) {
         return {
           lines: state.lines.map((l) =>
             l.product.id === product.id
-              ? { ...l, quantity: Math.min(l.quantity + 1, MAX_LINE_QTY) }
+              ? { ...l, quantity: Math.min(l.quantity + 1, ceiling) }
               : l,
           ),
         }
@@ -46,7 +49,10 @@ export const useCartStore = create<CartState>((set) => ({
     set((state) => ({
       lines: state.lines.map((l) =>
         l.product.id === productId
-          ? { ...l, quantity: Math.min(l.quantity + 1, MAX_LINE_QTY) }
+          ? {
+              ...l,
+              quantity: Math.min(l.quantity + 1, l.product.stock, MAX_LINE_QTY),
+            }
           : l,
       ),
     })),

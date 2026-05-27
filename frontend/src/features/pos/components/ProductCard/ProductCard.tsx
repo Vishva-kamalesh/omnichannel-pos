@@ -16,14 +16,22 @@ export function ProductCard({ product }: ProductCardProps) {
   const category = getCategoryMeta(product.category)
   const outOfStock = product.stock === 0
   const lowStock = !outOfStock && product.stock <= LOW_STOCK_THRESHOLD
+  // Stop adding once the cart holds every unit on hand.
+  const atStockLimit = quantityInCart >= product.stock
 
   return (
     <button
       type="button"
       className={styles.card}
       onClick={() => addProduct(product)}
-      disabled={outOfStock}
-      aria-label={`Add ${product.name} to cart`}
+      disabled={atStockLimit}
+      aria-label={
+        outOfStock
+          ? `${product.name} is out of stock`
+          : atStockLimit
+            ? `All ${product.stock} units of ${product.name} are in the cart`
+            : `Add ${product.name} to cart`
+      }
     >
       <div className={styles.top}>
         <span className={styles.category}>

@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { ScanBarcode, Search, X } from 'lucide-react'
-import type { Product } from '../../types/pos.types'
+import type { ScanResult } from '../../types/pos.types'
 import styles from './ProductSearch.module.css'
 
 type ProductSearchProps = {
   query: string
   onQueryChange: (value: string) => void
-  /** Returns the matched product when a code resolves, otherwise null. */
-  onBarcodeSubmit: (code: string) => Product | null
+  /** Resolves a scanned/typed code and reports whether it was added. */
+  onBarcodeSubmit: (code: string) => ScanResult
 }
 
 type Feedback = { tone: 'ok' | 'error'; message: string }
@@ -59,9 +59,14 @@ export function ProductSearch({
     event.preventDefault()
     const code = barcode.trim()
     if (!code) return
-    const product = onBarcodeSubmit(code)
-    if (product) {
-      flash({ tone: 'ok', message: `Added ${product.name}` })
+    const result = onBarcodeSubmit(code)
+    if (result.status === 'added') {
+      flash({ tone: 'ok', message: `Added ${result.product.name}` })
+    } else if (result.status === 'out-of-stock') {
+      flash({
+        tone: 'error',
+        message: `${result.product.name} — stock limit reached`,
+      })
     } else {
       flash({ tone: 'error', message: `No product matches "${code}"` })
     }
