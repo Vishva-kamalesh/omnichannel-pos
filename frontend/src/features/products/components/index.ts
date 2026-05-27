@@ -1,0 +1,5 @@
+export { ProductFormModal } from './ProductFormModal'
+export { ProductStatusBadge } from './ProductStatusBadge'
+export { ProductThumbnail } from './ProductThumbnail'
+export { ProductsTable } from './ProductsTable'
+export { ProductsToolbar } from './ProductsToolbar'

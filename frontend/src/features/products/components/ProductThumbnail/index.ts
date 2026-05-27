@@ -1,0 +1,1 @@
+export { ProductThumbnail } from './ProductThumbnail'
