@@ -1,66 +1,65 @@
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { PageShell } from '@/shared/ui/PageShell'
-import {
-  KPI_METRICS,
-  LOW_STOCK_ITEMS,
-  RECENT_TRANSACTIONS,
-  REVENUE_BY_CHANNEL,
-  REVENUE_COMPARISON,
-  TOP_PRODUCTS,
-} from '../data/dashboardMock'
+import { AsyncBoundary } from '@/shared/ui/AsyncBoundary'
+import { useAsync } from '@/shared/hooks/useAsync'
+import { dashboardApi } from '../services/dashboardApi'
 import {
   KpiGrid,
   LowStockAlerts,
   RecentTransactionsTable,
-  RevenueOverview,
-  SalesChartSection,
   TopSellingProducts,
 } from '../components'
 import styles from './DashboardPage.module.css'
 
+function formatToday(): string {
+  return new Date().toLocaleDateString('en-IN', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
 export function DashboardPage() {
+  const { data, loading, error, refetch } = useAsync(
+    () => dashboardApi.loadDashboard(),
+    [],
+  )
+
   return (
     <PageShell>
       <PageHeader
         title="Analytics"
-        description="Tuesday, 19 May 2026 · All locations · INR"
+        description={`${formatToday()} · All locations · INR`}
         actions={
           <div className={styles.headerActions}>
-            <select className={styles.locationSelect} defaultValue="all" aria-label="Location filter">
-              <option value="all">All locations</option>
-              <option value="flagship">Downtown Flagship</option>
-              <option value="mall">Mall Outlet</option>
-              <option value="warehouse">Warehouse — West</option>
-            </select>
-            <button type="button" className={styles.exportBtn}>
-              Export
+            <button
+              type="button"
+              className={styles.exportBtn}
+              onClick={() => refetch()}
+            >
+              Refresh
             </button>
           </div>
         }
       />
 
-      <KpiGrid metrics={KPI_METRICS} />
+      <AsyncBoundary loading={loading} error={error} onRetry={refetch}>
+        {data ? (
+          <>
+            <KpiGrid metrics={data.kpis} />
 
-      <div className={styles.analyticsRow}>
-        <div className={styles.primaryCol}>
-          <SalesChartSection />
-        </div>
-        <div className={styles.secondaryCol}>
-          <RevenueOverview
-            channels={REVENUE_BY_CHANNEL}
-            comparison={REVENUE_COMPARISON}
-          />
-        </div>
-      </div>
+            <div className={styles.transactionsRow}>
+              <RecentTransactionsTable transactions={data.recentTransactions} />
+            </div>
 
-      <div className={styles.transactionsRow}>
-        <RecentTransactionsTable transactions={RECENT_TRANSACTIONS} />
-      </div>
-
-      <div className={styles.insightsRow}>
-        <LowStockAlerts items={LOW_STOCK_ITEMS} />
-        <TopSellingProducts products={TOP_PRODUCTS} />
-      </div>
+            <div className={styles.insightsRow}>
+              <LowStockAlerts items={data.lowStock} />
+              <TopSellingProducts products={data.topProducts} />
+            </div>
+          </>
+        ) : null}
+      </AsyncBoundary>
     </PageShell>
   )
 }

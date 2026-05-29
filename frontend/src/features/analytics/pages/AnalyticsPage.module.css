@@ -1,0 +1,106 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 1100px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.cardFull {
+  grid-column: 1 / -1;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.cardTitle {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.cardSub {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.toggle {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.toggleBtn {
+  padding: 6px 12px;
+  border: none;
+  background-color: var(--color-bg-app);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.toggleBtn + .toggleBtn {
+  border-left: 1px solid var(--color-border);
+}
+
+.toggleActive {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.table th {
+  text-align: left;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.numericCol {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  text-align: center;
+  padding: var(--space-6);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
