@@ -1,5 +1,5 @@
 import { Search, X } from 'lucide-react'
-import { INVENTORY_CATEGORIES, STOCK_LOCATIONS } from '../../data/inventoryMock'
+import type { StockLocation } from '../../types/inventory.types'
 import styles from './InventoryToolbar.module.css'
 
 type InventoryToolbarProps = {
@@ -14,6 +14,8 @@ type InventoryToolbarProps = {
   resultCount: number
   totalCount: number
   onReset: () => void
+  locations?: StockLocation[]
+  categories?: string[]
 }
 
 export function InventoryToolbar({
@@ -28,9 +30,11 @@ export function InventoryToolbar({
   resultCount,
   totalCount,
   onReset,
+  locations = [],
+  categories = [],
 }: InventoryToolbarProps) {
-  const stores = STOCK_LOCATIONS.filter((loc) => loc.type === 'store')
-  const warehouses = STOCK_LOCATIONS.filter((loc) => loc.type === 'warehouse')
+  const stores = locations.filter((loc) => loc.type === 'store')
+  const warehouses = locations.filter((loc) => loc.type === 'warehouse')
   const hasActiveFilters =
     search.trim() !== '' ||
     location !== 'all' ||
@@ -95,7 +99,7 @@ export function InventoryToolbar({
           aria-label="Filter by category"
         >
           <option value="all">All categories</option>
-          {INVENTORY_CATEGORIES.map((cat) => (
+          {categories.map((cat) => (
             <option key={cat} value={cat}>
               {cat}
             </option>
