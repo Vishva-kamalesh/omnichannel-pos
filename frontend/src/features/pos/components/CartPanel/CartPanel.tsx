@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
+  AlertCircle,
   CheckCircle2,
   ChevronsUpDown,
   Pause,
@@ -7,7 +8,9 @@ import {
   Trash2,
   UserRound,
 } from 'lucide-react'
+import axios from 'axios'
 import { formatINR } from '../../data/posMock'
+import { posApi } from '../../services/posApi'
 import {
   DISCOUNT_OPTIONS,
   getCartSummary,
@@ -26,23 +29,34 @@ const PAYMENT_LABELS: Record<PaymentMethodId, string> = {
   wallet: 'Wallet',
 }
 
+const PAYMENT_BACKEND_MAP: Record<PaymentMethodId, 'cash' | 'card' | 'upi' | 'credit'> = {
+  cash: 'cash',
+  card: 'card',
+  upi: 'upi',
+  wallet: 'credit',
+}
+
 type Receipt = {
-  orderNo: number
+  orderNo: string
   total: number
   method: PaymentMethodId
 }
 
-export function CartPanel() {
+type CartPanelProps = {
+  storeId: string
+  onCheckoutComplete?: () => void | Promise<void>
+}
+
+export function CartPanel({ storeId, onCheckoutComplete }: CartPanelProps) {
   const lines = useCartStore((s) => s.lines)
   const discountRate = useCartStore((s) => s.discountRate)
   const setDiscountRate = useCartStore((s) => s.setDiscountRate)
   const clearCart = useCartStore((s) => s.clearCart)
 
-  const [orderNo, setOrderNo] = useState(
-    () => 1040 + Math.floor(Math.random() * 60),
-  )
   const [payment, setPayment] = useState<PaymentMethodId>('cash')
   const [receipt, setReceipt] = useState<Receipt | null>(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const listRef = useRef<HTMLUListElement>(null)
   const receiptTimer = useRef<number | undefined>(undefined)
 
@@ -57,18 +71,49 @@ export function CartPanel() {
 
   useEffect(() => () => window.clearTimeout(receiptTimer.current), [])
 
-  function handleCheckout() {
-    if (isEmpty) return
-    setReceipt({ orderNo, total: summary.total, method: payment })
-    clearCart()
-    setOrderNo((current) => current + 1)
-    window.clearTimeout(receiptTimer.current)
-    receiptTimer.current = window.setTimeout(() => setReceipt(null), 6000)
+  async function handleCheckout() {
+    if (isEmpty || submitting) return
+    setSubmitting(true)
+    setCheckoutError(null)
+    try {
+      const order = await posApi.createOrder({
+        storeId,
+        items: lines.map((line) => ({
+          productId: line.product.id,
+          quantity: line.quantity,
+        })),
+        paymentMethod: PAYMENT_BACKEND_MAP[payment],
+        tax: Math.round(summary.taxAmount * 100) / 100,
+        discount: Math.round(summary.discountAmount * 100) / 100,
+      })
+      setReceipt({
+        orderNo: order.orderNumber,
+        total: order.finalAmount,
+        method: payment,
+      })
+      clearCart()
+      window.clearTimeout(receiptTimer.current)
+      receiptTimer.current = window.setTimeout(() => setReceipt(null), 6000)
+      await onCheckoutComplete?.()
+    } catch (err) {
+      let message = 'Checkout failed. Please try again.'
+      if (axios.isAxiosError(err)) {
+        message =
+          (err.response?.data as { message?: string } | undefined)?.message ??
+          err.message
+      } else if (err instanceof Error) {
+        message = err.message
+      }
+      setCheckoutError(message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   function handleClear() {
     clearCart()
     setReceipt(null)
+    setCheckoutError(null)
   }
 
   return (
@@ -77,7 +122,7 @@ export function CartPanel() {
         <div className={styles.headerTop}>
           <div>
             <h2 className={styles.title}>Current Sale</h2>
-            <p className={styles.orderNo}>Order #{orderNo} · Register 02</p>
+            <p className={styles.orderNo}>Register 02 · Live</p>
           </div>
           <button
             type="button"
@@ -111,7 +156,7 @@ export function CartPanel() {
             </span>
             <p className={styles.stateTitle}>Payment received</p>
             <p className={styles.receiptMeta}>
-              Order #{receipt.orderNo} · {formatINR(receipt.total)} ·{' '}
+              {receipt.orderNo} · {formatINR(receipt.total)} ·{' '}
               {PAYMENT_LABELS[receipt.method]}
             </p>
             <p className={styles.stateHint}>
@@ -169,11 +214,18 @@ export function CartPanel() {
 
         <OrderSummary summary={summary} />
 
+        {checkoutError ? (
+          <div className={styles.checkoutError} role="alert">
+            <AlertCircle size={14} strokeWidth={2} aria-hidden="true" />
+            <span>{checkoutError}</span>
+          </div>
+        ) : null}
+
         <PaymentMethods
           selected={payment}
           onSelect={setPayment}
           total={summary.total}
-          disabled={isEmpty}
+          disabled={isEmpty || submitting}
           onCheckout={handleCheckout}
         />
       </footer>

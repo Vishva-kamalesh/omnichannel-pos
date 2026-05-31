@@ -19,10 +19,13 @@ import {
 import {
   formatINR,
   getAvailable,
-  getLocation,
   getStockStatus,
 } from '../../data/inventoryMock'
-import type { InventoryItem, StockStatus } from '../../types/inventory.types'
+import type {
+  InventoryItem,
+  StockLocation,
+  StockStatus,
+} from '../../types/inventory.types'
 import { InventoryPagination } from '../InventoryPagination'
 import { StockStatusBadge } from '../StockStatusBadge'
 import styles from './InventoryTable.module.css'
@@ -45,7 +48,15 @@ const NUMERIC_COLUMNS = new Set([
 
 const columnHelper = createColumnHelper<InventoryItem>()
 
-const columns = [
+const FALLBACK_LOCATION: StockLocation = {
+  id: 'unknown',
+  code: 'STR',
+  name: 'Unknown store',
+  type: 'store',
+}
+
+function buildColumns(locationsById: Map<string, StockLocation>) {
+  return [
   columnHelper.accessor('name', {
     header: 'Product',
     cell: (ctx) => (
@@ -62,12 +73,13 @@ const columns = [
   columnHelper.accessor('locationId', {
     id: 'location',
     header: 'Location',
-    sortingFn: (rowA, rowB) =>
-      getLocation(rowA.original.locationId).name.localeCompare(
-        getLocation(rowB.original.locationId).name,
-      ),
+    sortingFn: (rowA, rowB) => {
+      const a = locationsById.get(rowA.original.locationId) ?? FALLBACK_LOCATION
+      const b = locationsById.get(rowB.original.locationId) ?? FALLBACK_LOCATION
+      return a.name.localeCompare(b.name)
+    },
     cell: (ctx) => {
-      const location = getLocation(ctx.getValue())
+      const location = locationsById.get(ctx.getValue()) ?? FALLBACK_LOCATION
       return (
         <div className={styles.location}>
           <span className={styles.locationName}>{location.name}</span>
@@ -134,7 +146,8 @@ const columns = [
       STATUS_RANK[getStockStatus(rowB.original)],
     cell: (ctx) => <StockStatusBadge status={ctx.getValue()} />,
   }),
-]
+  ]
+}
 
 function SortIcon({ direction }: { direction: SortDirection | false }) {
   if (direction === 'asc') {
@@ -152,9 +165,10 @@ function SortIcon({ direction }: { direction: SortDirection | false }) {
 
 type InventoryTableProps = {
   items: InventoryItem[]
+  locations?: StockLocation[]
 }
 
-export function InventoryTable({ items }: InventoryTableProps) {
+export function InventoryTable({ items, locations = [] }: InventoryTableProps) {
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'status', desc: false },
   ])
@@ -162,6 +176,10 @@ export function InventoryTable({ items }: InventoryTableProps) {
     pageIndex: 0,
     pageSize: 10,
   })
+
+  const columns = useState(() =>
+    buildColumns(new Map(locations.map((loc) => [loc.id, loc]))),
+  )[0]
 
   const table = useReactTable({
     data: items,

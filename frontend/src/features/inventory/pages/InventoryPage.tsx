@@ -2,11 +2,13 @@ import { useMemo, useState } from 'react'
 import { Download, PackagePlus } from 'lucide-react'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { PageShell } from '@/shared/ui/PageShell'
+import { AsyncBoundary } from '@/shared/ui/AsyncBoundary'
+import { useAsync } from '@/shared/hooks/useAsync'
 import {
-  INVENTORY_ITEMS,
   getInventorySummary,
   getStockStatus,
 } from '../data/inventoryMock'
+import { inventoryApi } from '../services/inventoryApi'
 import {
   InventorySummary,
   InventoryTable,
@@ -20,11 +22,20 @@ export function InventoryPage() {
   const [category, setCategory] = useState('all')
   const [status, setStatus] = useState('all')
 
-  const summary = useMemo(() => getInventorySummary(INVENTORY_ITEMS), [])
+  const { data, loading, error, refetch } = useAsync(
+    () => inventoryApi.listInventory(),
+    [],
+  )
+
+  const items = data?.items ?? []
+  const locations = data?.locations ?? []
+  const categories = data?.categories ?? []
+
+  const summary = useMemo(() => getInventorySummary(items), [items])
 
   const filteredItems = useMemo(() => {
     const term = search.trim().toLowerCase()
-    return INVENTORY_ITEMS.filter((item) => {
+    return items.filter((item) => {
       if (location !== 'all' && item.locationId !== location) return false
       if (category !== 'all' && item.category !== category) return false
       if (status !== 'all' && getStockStatus(item) !== status) return false
@@ -34,7 +45,7 @@ export function InventoryPage() {
       }
       return true
     })
-  }, [search, location, category, status])
+  }, [items, search, location, category, status])
 
   function resetFilters() {
     setSearch('')
@@ -62,24 +73,34 @@ export function InventoryPage() {
         }
       />
 
-      <InventorySummary metrics={summary} />
+      <AsyncBoundary
+        loading={loading}
+        error={error}
+        onRetry={refetch}
+        isEmpty={!loading && !error && items.length === 0}
+        emptyMessage="No inventory records yet. Receive stock to get started."
+      >
+        <InventorySummary metrics={summary} />
 
-      <div className={styles.panel}>
-        <InventoryToolbar
-          search={search}
-          onSearchChange={setSearch}
-          location={location}
-          onLocationChange={setLocation}
-          category={category}
-          onCategoryChange={setCategory}
-          status={status}
-          onStatusChange={setStatus}
-          resultCount={filteredItems.length}
-          totalCount={INVENTORY_ITEMS.length}
-          onReset={resetFilters}
-        />
-        <InventoryTable items={filteredItems} />
-      </div>
+        <div className={styles.panel}>
+          <InventoryToolbar
+            search={search}
+            onSearchChange={setSearch}
+            location={location}
+            onLocationChange={setLocation}
+            category={category}
+            onCategoryChange={setCategory}
+            status={status}
+            onStatusChange={setStatus}
+            resultCount={filteredItems.length}
+            totalCount={items.length}
+            onReset={resetFilters}
+            locations={locations}
+            categories={categories}
+          />
+          <InventoryTable items={filteredItems} locations={locations} />
+        </div>
+      </AsyncBoundary>
     </PageShell>
   )
 }
