@@ -1,7 +1,11 @@
 import { useMemo, useState } from 'react'
-import { CATEGORIES, POS_PRODUCTS, findProductByCode } from '../data/posMock'
+import { CATEGORIES, getCategoryMeta } from '../data/posMock'
+import { posApi } from '../services/posApi'
 import { useCartStore } from '../store/cartStore'
-import type { ScanResult } from '../types/pos.types'
+import { useAuthStore } from '@/features/auth'
+import { useAsync } from '@/shared/hooks/useAsync'
+import { AsyncBoundary } from '@/shared/ui/AsyncBoundary'
+import type { Product, ScanResult } from '../types/pos.types'
 import {
   CartPanel,
   CategoryFilter,
@@ -15,25 +19,34 @@ export function PosPage() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<CategoryId>('all')
   const addProduct = useCartStore((s) => s.addProduct)
+  const user = useAuthStore((s) => s.user)
+  const storeId = user?.storeId
+
+  const { data, loading, error, refetch } = useAsync<Product[]>(
+    async () => (storeId ? posApi.listProductsWithStock(storeId) : []),
+    [storeId],
+  )
+
+  const products = data ?? []
 
   const categoryOptions = useMemo<CategoryOption[]>(() => {
     const options: CategoryOption[] = [
-      { id: 'all', label: 'All items', count: POS_PRODUCTS.length },
+      { id: 'all', label: 'All items', count: products.length },
     ]
     for (const meta of CATEGORIES) {
       options.push({
         id: meta.id,
         label: meta.label,
         accent: meta.accent,
-        count: POS_PRODUCTS.filter((p) => p.category === meta.id).length,
+        count: products.filter((p) => p.category === meta.id).length,
       })
     }
     return options
-  }, [])
+  }, [products])
 
   const filteredProducts = useMemo(() => {
     const term = query.trim().toLowerCase()
-    return POS_PRODUCTS.filter((product) => {
+    return products.filter((product) => {
       if (category !== 'all' && product.category !== category) return false
       if (!term) return true
       return (
@@ -42,12 +55,19 @@ export function PosPage() {
         product.barcode.includes(term)
       )
     })
-  }, [query, category])
+  }, [query, category, products])
+
+  function findProductByCode(rawCode: string): Product | undefined {
+    const code = rawCode.trim().toLowerCase()
+    if (!code) return undefined
+    return products.find(
+      (p) => p.barcode === code || p.sku.toLowerCase() === code,
+    )
+  }
 
   function handleBarcode(code: string): ScanResult {
     const product = findProductByCode(code)
     if (!product) return { status: 'not-found' }
-    // Block the scan when every available unit is already on the bill.
     const inCart =
       useCartStore
         .getState()
@@ -55,6 +75,22 @@ export function PosPage() {
     if (inCart >= product.stock) return { status: 'out-of-stock', product }
     addProduct(product)
     return { status: 'added', product }
+  }
+
+  // Reference category meta to silence unused-import lint while keeping export available.
+  void getCategoryMeta
+
+  if (!storeId) {
+    return (
+      <div className={styles.page}>
+        <AsyncBoundary
+          loading={false}
+          error="Your account is not assigned to a store. Ask an admin to assign one."
+        >
+          <></>
+        </AsyncBoundary>
+      </div>
+    )
   }
 
   return (
@@ -74,12 +110,20 @@ export function PosPage() {
           />
         </div>
         <div className={styles.catalogBody}>
-          <ProductGrid products={filteredProducts} />
+          <AsyncBoundary
+            loading={loading}
+            error={error}
+            isEmpty={!loading && !error && products.length === 0}
+            emptyMessage="No products available for this store yet."
+            onRetry={refetch}
+          >
+            <ProductGrid products={filteredProducts} />
+          </AsyncBoundary>
         </div>
       </section>
 
       <aside className={styles.cart}>
-        <CartPanel />
+        <CartPanel storeId={storeId} onCheckoutComplete={refetch} />
       </aside>
     </div>
   )
