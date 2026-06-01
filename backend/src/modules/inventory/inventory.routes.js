@@ -3,7 +3,7 @@ const inventoryController = require("./inventory.controller.js");
 const inventoryValidation = require("./inventory.validation.js");
 const validate = require("../../middlewares/validate.middleware.js");
 const { protect } = require("../auth/auth.middleware.js");
-const authorize = require("../../middlewares/role.middleware.js");
+const { authorize } = require("../../middlewares/role.middleware.js");
 
 const router = express.Router();
 
