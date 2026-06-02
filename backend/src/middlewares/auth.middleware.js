@@ -15,7 +15,10 @@ const protect = asyncHandler(async (req, res, next) => {
       token = req.headers.authorization.split(" ")[1];
 
       // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || "secret");
+      // Use the same secret the token was signed with (utils/generateToken).
+      // No "secret" fallback — a missing JWT_SECRET must fail loudly, not verify
+      // against a different key than the one used to sign.
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
       // Get user from the token
       req.user = await User.findById(decoded.id).select("-password");
