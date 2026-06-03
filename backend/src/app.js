@@ -7,6 +7,9 @@ const authRoutes = require("./modules/auth/auth.routes");
 const productRoutes = require("./modules/products/product.routes");
 const inventoryRoutes = require("./modules/inventory/inventory.routes");
 const analyticsRoutes = require("./modules/analytics/analytics.routes");
+const orderRoutes = require("./modules/orders/order.routes");
+const userRoutes = require("./modules/users/user.routes");
+const storeRoutes = require("./modules/stores/store.routes");
 
 const app = express();
 
@@ -56,6 +59,14 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/inventory", inventoryRoutes);
 app.use("/api/v1/analytics", analyticsRoutes);
+app.use("/api/v1/orders", orderRoutes);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/stores", storeRoutes);
+
+// Health check
+app.get("/health", (req, res) => {
+  res.status(200).json({ success: true, status: "ok", uptime: process.uptime() });
+});
 
 // Root route
 app.get("/", (req, res) => {
