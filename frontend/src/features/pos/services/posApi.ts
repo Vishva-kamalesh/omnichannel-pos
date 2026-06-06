@@ -1,7 +1,13 @@
 import { api } from '@/shared/services'
-import type { Product, ProductCategory } from '../types/pos.types'
+import type { Product, ProductCategory, StoreOption } from '../types/pos.types'
 
 type ApiEnvelope<T> = { success: boolean; message: string; data: T }
+
+type BackendStore = {
+  _id: string
+  name: string
+  location?: string
+}
 
 type BackendProduct = {
   _id: string
@@ -56,13 +62,31 @@ function toProduct(p: BackendProduct, stock: number): Product {
 }
 
 export const posApi = {
+  /** Active stores the terminal can sell from — powers the header store picker. */
+  async listStores(): Promise<StoreOption[]> {
+    const { data } = await api.get<ApiEnvelope<{ stores: BackendStore[] }>>(
+      '/stores',
+      { params: { limit: 50, isActive: 'true' } },
+    )
+    return data.data.stores.map((s) => ({
+      id: s._id,
+      name: s.name,
+      location: s.location ?? '',
+    }))
+  },
+
   async listProductsWithStock(storeId: string): Promise<Product[]> {
+    // The product catalog is global; per-store availability is tracked in the
+    // Inventory collection (and that's what checkout validates against — see the
+    // backend order service). So we load the full catalog and overlay the
+    // selected store's on-hand stock, rather than filtering products by storeId
+    // (products are only "owned" by their creating store, not stocked by it).
     const [{ data: productsRes }, { data: invRes }] = await Promise.all([
       api.get<ApiEnvelope<{ products: BackendProduct[] }>>('/products', {
-        params: { limit: 200, storeId },
+        params: { limit: 200 },
       }),
       api.get<ApiEnvelope<{ inventory: BackendInventory[] }>>('/inventory', {
-        params: { limit: 200, storeId },
+        params: { limit: 500, storeId },
       }),
     ])
 
@@ -75,7 +99,7 @@ export const posApi = {
 
     return productsRes.data.products
       .filter((p) => p.isActive)
-      .map((p) => toProduct(p, stockMap.get(p._id) ?? p.stock ?? 0))
+      .map((p) => toProduct(p, stockMap.get(p._id) ?? 0))
   },
 
   async createOrder(payload: {

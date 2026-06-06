@@ -19,6 +19,11 @@
   background-color: #eff6ff;
 }
 
+.pending {
+  color: #92400e;
+  background-color: #fef3c7;
+}
+
 .shipped {
   color: #5b21b6;
   background-color: #f5f3ff;

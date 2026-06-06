@@ -13,8 +13,10 @@
 }
 
 .label {
+  font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
+  letter-spacing: 0.01em;
   color: var(--color-text-muted);
 }
 
@@ -64,6 +66,7 @@
 }
 
 .hint {
+  font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }

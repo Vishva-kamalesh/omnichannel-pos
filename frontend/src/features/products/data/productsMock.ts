@@ -14,10 +14,10 @@ export const PRODUCT_CATEGORIES = [
 ] as const
 
 const CATEGORY_ACCENT: Record<string, string> = {
-  Apparel: '#6366f1',
+  Apparel: '#295e8c',
   Footwear: '#0891b2',
   Accessories: '#d97706',
-  Bags: '#7c3aed',
+  Bags: '#be185d',
   'Home & Living': '#0e9f6e',
   Electronics: '#2563eb',
 }

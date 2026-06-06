@@ -1,7 +1,8 @@
-import { Bell, ChevronDown, Menu, Search } from 'lucide-react'
-import { useLocation } from 'react-router-dom'
-import { DEFAULT_STORE_NAME, MAIN_NAVIGATION } from '@/shared/constants'
+import { Bell, LogOut, Menu, Search } from 'lucide-react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { DEFAULT_STORE_NAME, MAIN_NAVIGATION, ROUTES } from '@/shared/constants'
 import { useUIStore } from '@/app/store'
+import { useAuthStore } from '@/features/auth'
 import styles from './Navbar.module.css'
 
 function getPageTitle(pathname: string): string {
@@ -15,10 +16,36 @@ function getPageTitle(pathname: string): string {
   return 'Dashboard'
 }
 
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('')
+}
+
+function formatRole(role?: string): string {
+  if (!role) return 'Team Member'
+  return role.charAt(0).toUpperCase() + role.slice(1)
+}
+
 export function Navbar() {
   const location = useLocation()
+  const navigate = useNavigate()
   const toggleMobileSidebar = useUIStore((s) => s.toggleMobileSidebar)
+  const user = useAuthStore((s) => s.user)
+  const logout = useAuthStore((s) => s.logout)
   const pageTitle = getPageTitle(location.pathname)
+
+  const displayName = user?.name ?? 'Guest User'
+  const displayRole = formatRole(user?.role)
+  const initials = getInitials(displayName) || 'NA'
+
+  function handleLogout() {
+    logout()
+    navigate(ROUTES.LOGIN, { replace: true })
+  }
 
   return (
     <header className={styles.navbar}>
@@ -59,15 +86,24 @@ export function Navbar() {
           <span className={styles.notificationDot} aria-hidden="true" />
         </button>
 
-        <button type="button" className={styles.userBtn} aria-label="Account menu">
+        <div className={styles.userBtn} aria-label="Account">
           <span className={styles.avatar} aria-hidden="true">
-            AK
+            {initials}
           </span>
           <span className={styles.userMeta}>
-            <span className={styles.userName}>Amit Kumar</span>
-            <span className={styles.userRole}>Store Manager</span>
+            <span className={styles.userName}>{displayName}</span>
+            <span className={styles.userRole}>{displayRole}</span>
           </span>
-          <ChevronDown size={16} strokeWidth={1.75} aria-hidden="true" />
+        </div>
+
+        <button
+          type="button"
+          className={styles.iconBtn}
+          aria-label="Sign out"
+          onClick={handleLogout}
+          title="Sign out"
+        >
+          <LogOut size={18} strokeWidth={1.75} />
         </button>
       </div>
     </header>

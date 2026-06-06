@@ -1,32 +1,36 @@
 :root {
-  /* Brand */
-  --color-primary: #6366f1;
-  --color-primary-hover: #4f46e5;
-  --color-primary-muted: #eef2ff;
+  /* Brand — steel blue (matches the login accent) */
+  --color-primary: #295e8c;
+  --color-primary-hover: #1f4a6d;
+  --color-primary-muted: #e6eef5;
+  /* Brightened steel for the active state on the dark sidebar, where the base
+     #295e8c is too low-contrast against warm charcoal to read clearly. */
+  --color-sidebar-accent: #6ea6da;
   --color-success: #22c55e;
   --color-danger: #ef4444;
   --color-warning: #f59e0b;
 
-  /* Surfaces */
-  --color-bg-app: #f5f7fb;
-  --color-bg-surface: #ffffff;
-  --color-bg-elevated: #ffffff;
-  --color-bg-sidebar: #111827;
-  --color-bg-sidebar-hover: #1f2937;
-  --color-bg-sidebar-active: #1e293b;
+  /* Surfaces — warm off-white / paper (no pure white) */
+  --color-bg-app: #f1ebe0;
+  --color-bg-surface: #faf6ee;
+  --color-bg-elevated: #faf6ee;
+  /* Temperature-neutral near-black (equal R/G/B) — no cool or warm cast. */
+  --color-bg-sidebar: #181818;
+  --color-bg-sidebar-hover: #262626;
+  --color-bg-sidebar-active: #303030;
 
-  /* Text */
-  --color-text-primary: #111827;
-  --color-text-secondary: #4b5563;
-  --color-text-muted: #6b7280;
-  --color-text-inverse: #f9fafb;
-  --color-text-sidebar: #9ca3af;
-  --color-text-sidebar-active: #ffffff;
+  /* Text — warm charcoal */
+  --color-text-primary: #211e1a;
+  --color-text-secondary: #514a3f;
+  --color-text-muted: #8a8276;
+  --color-text-inverse: #f6f2ea;
+  --color-text-sidebar: #9b9b9b;
+  --color-text-sidebar-active: #f4f4f5;
 
-  /* Borders */
-  --color-border: #e5e7eb;
-  --color-border-strong: #d1d5db;
-  --color-border-sidebar: #1f2937;
+  /* Borders — warm taupe */
+  --color-border: #e6ddcd;
+  --color-border-strong: #d4c9b6;
+  --color-border-sidebar: #2c2c2c;
 
   /* Layout */
   --sidebar-width: 240px;
@@ -44,8 +48,9 @@
   --space-8: 32px;
 
   /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, sans-serif;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', monospace;
   --font-size-xs: 0.6875rem;
   --font-size-sm: 0.8125rem;
   --font-size-base: 0.875rem;
