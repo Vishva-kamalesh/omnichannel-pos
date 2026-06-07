@@ -66,6 +66,5 @@ typings/
 .DS_Store
 Thumbs.db
 CLAUDE.md
-PROJECT_SUMMARY.md
+
 .claude
-FRONTEND_DEEP_DIVE.md

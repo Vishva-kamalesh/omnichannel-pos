@@ -22,7 +22,7 @@ function formatINR(value: number): string {
 
 function SalesCard() {
   const [type, setType] = useState<'daily' | 'weekly' | 'monthly'>('weekly')
-  const { data, loading, error, refetch } = useAsync<SalesPoint[]>(
+  const { data, loading, error, status, refetch } = useAsync<SalesPoint[]>(
     () => analyticsApi.getSales(type),
     [type],
   )
@@ -61,6 +61,7 @@ function SalesCard() {
       <AsyncBoundary
         loading={loading}
         error={error}
+        status={status}
         onRetry={refetch}
         isEmpty={!loading && !error && chartData.length === 0}
         emptyMessage="No sales recorded in this period."
@@ -71,11 +72,13 @@ function SalesCard() {
             <XAxis dataKey="date" tick={{ fontSize: 11 }} />
             <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => formatINR(v)} />
             <Tooltip
-              formatter={(value: number, name: string) =>
-                name === 'sales' ? [formatINR(value), 'Sales'] : [value, 'Orders']
+              formatter={(value, name) =>
+                name === 'sales'
+                  ? [formatINR(Number(value)), 'Sales']
+                  : [String(value), 'Orders']
               }
             />
-            <Bar dataKey="sales" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="sales" fill="#295e8c" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </AsyncBoundary>
@@ -84,7 +87,7 @@ function SalesCard() {
 }
 
 function CashierCard() {
-  const { data, loading, error, refetch } = useAsync(
+  const { data, loading, error, status, refetch } = useAsync(
     () => analyticsApi.getCashierPerformance(),
     [],
   )
@@ -101,6 +104,7 @@ function CashierCard() {
       <AsyncBoundary
         loading={loading}
         error={error}
+        status={status}
         onRetry={refetch}
         isEmpty={!loading && !error && rows.length === 0}
         emptyMessage="No cashier activity yet."
@@ -135,7 +139,7 @@ function CashierCard() {
 }
 
 function StoreCard() {
-  const { data, loading, error, refetch } = useAsync(
+  const { data, loading, error, status, refetch } = useAsync(
     () => analyticsApi.getStorePerformance(),
     [],
   )
@@ -152,6 +156,7 @@ function StoreCard() {
       <AsyncBoundary
         loading={loading}
         error={error}
+        status={status}
         onRetry={refetch}
         isEmpty={!loading && !error && rows.length === 0}
         emptyMessage="No store activity yet."

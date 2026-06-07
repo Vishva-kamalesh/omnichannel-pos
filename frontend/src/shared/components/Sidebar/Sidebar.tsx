@@ -1,5 +1,10 @@
 import { PanelLeftClose, PanelLeftOpen, ShoppingBag } from 'lucide-react'
-import { APP_NAME, MAIN_NAVIGATION } from '@/shared/constants'
+import {
+  APP_NAME,
+  MAIN_NAVIGATION,
+  filterNavigationByRole,
+} from '@/shared/constants'
+import { useAuthStore } from '@/features/auth'
 import { useUIStore } from '@/app/store'
 import { SidebarNavItem } from './SidebarNavItem'
 import styles from './Sidebar.module.css'
@@ -9,6 +14,9 @@ export function Sidebar() {
   const mobileSidebarOpen = useUIStore((s) => s.mobileSidebarOpen)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
   const closeMobileSidebar = useUIStore((s) => s.closeMobileSidebar)
+  const role = useAuthStore((s) => s.user?.role)
+
+  const navigation = filterNavigationByRole(MAIN_NAVIGATION, role)
 
   const sidebarClassName = [
     styles.sidebar,
@@ -42,7 +50,7 @@ export function Sidebar() {
         </div>
 
         <nav className={styles.nav}>
-          {MAIN_NAVIGATION.map((section) => (
+          {navigation.map((section) => (
             <div key={section.id} className={styles.section}>
               {!sidebarCollapsed && section.title && (
                 <p className={styles.sectionTitle}>{section.title}</p>

@@ -26,7 +26,7 @@ export function UsersPage() {
   const [search, setSearch] = useState('')
   const [role, setRole] = useState('')
 
-  const { data, loading, error, refetch } = useAsync(
+  const { data, loading, error, status, refetch } = useAsync(
     () =>
       usersApi.list({
         search: search.trim() || undefined,
@@ -71,6 +71,7 @@ export function UsersPage() {
       <AsyncBoundary
         loading={loading}
         error={error}
+        status={status}
         onRetry={refetch}
         isEmpty={!loading && !error && users.length === 0}
         emptyMessage="No users found."
