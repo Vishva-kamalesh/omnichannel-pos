@@ -27,6 +27,13 @@ export type CategoryMeta = {
   accent: string
 }
 
+/** A store the terminal can ring sales against (used by the header picker). */
+export type StoreOption = {
+  id: string
+  name: string
+  location: string
+}
+
 export type PaymentMethodId = 'cash' | 'card' | 'upi' | 'wallet'
 
 /** Outcome of resolving a scanned or typed code at the terminal. */

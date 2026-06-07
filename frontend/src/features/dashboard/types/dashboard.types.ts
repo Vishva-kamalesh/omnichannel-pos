@@ -33,6 +33,7 @@ export type RevenueComparison = {
 
 export type TransactionStatus =
   | 'completed'
+  | 'pending'
   | 'processing'
   | 'shipped'
   | 'picking'

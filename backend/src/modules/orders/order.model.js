@@ -78,7 +78,7 @@ const orderSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["completed", "cancelled", "returned"],
+      enum: ["completed", "pending", "processing", "cancelled", "returned"],
       default: "completed",
     },
     storeId: {

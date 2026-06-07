@@ -3,6 +3,7 @@ import styles from './StatusBadge.module.css'
 
 const STATUS_LABELS: Record<TransactionStatus, string> = {
   completed: 'Completed',
+  pending: 'Pending',
   processing: 'Processing',
   shipped: 'Shipped',
   picking: 'Picking',

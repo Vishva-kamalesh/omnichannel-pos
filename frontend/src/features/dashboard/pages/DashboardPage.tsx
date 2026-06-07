@@ -21,7 +21,7 @@ function formatToday(): string {
 }
 
 export function DashboardPage() {
-  const { data, loading, error, refetch } = useAsync(
+  const { data, loading, error, status, refetch } = useAsync(
     () => dashboardApi.loadDashboard(),
     [],
   )
@@ -31,6 +31,7 @@ export function DashboardPage() {
       <PageHeader
         title="Analytics"
         description={`${formatToday()} · All locations · INR`}
+        descriptionMono
         actions={
           <div className={styles.headerActions}>
             <button
@@ -44,7 +45,7 @@ export function DashboardPage() {
         }
       />
 
-      <AsyncBoundary loading={loading} error={error} onRetry={refetch}>
+      <AsyncBoundary loading={loading} error={error} status={status} onRetry={refetch}>
         {data ? (
           <>
             <KpiGrid metrics={data.kpis} />

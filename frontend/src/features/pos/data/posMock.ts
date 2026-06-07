@@ -9,7 +9,7 @@ export const CATEGORIES: CategoryMeta[] = [
   { id: 'bakery', label: 'Bakery', accent: '#d97706' },
   { id: 'dairy', label: 'Dairy', accent: '#0891b2' },
   { id: 'snacks', label: 'Snacks', accent: '#db2777' },
-  { id: 'personal-care', label: 'Personal Care', accent: '#7c3aed' },
+  { id: 'personal-care', label: 'Personal Care', accent: '#0f766e' },
   { id: 'household', label: 'Household', accent: '#475569' },
 ]
 

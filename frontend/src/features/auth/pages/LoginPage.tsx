@@ -4,20 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import {
-  AlertCircle,
-  Eye,
-  EyeOff,
-  Lock,
-  LogIn,
-  Mail,
-  ShieldCheck,
-  Sparkles,
-  Store,
-} from 'lucide-react'
+import { toast } from 'sonner'
+import { Eye, EyeOff } from 'lucide-react'
 import { authService } from '../services/authService'
 import { useAuthStore } from '../store/authStore'
-import { ROUTES } from '@/shared/constants'
+import { getDefaultRouteForRole } from '@/shared/constants'
 import { APP_NAME } from '@/shared/constants/navigation'
 import styles from './LoginPage.module.css'
 
@@ -32,10 +23,25 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
+function BrandMark() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M4 5l8 14 8-14"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const setSession = useAuthStore((s) => s.setSession)
+  const sessionExpired = useAuthStore((s) => s.sessionExpired)
 
   const [showPassword, setShowPassword] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
@@ -49,8 +55,7 @@ export function LoginPage() {
     defaultValues: { email: '', password: '', remember: true },
   })
 
-  const redirectTo =
-    (location.state as { from?: string } | null)?.from ?? ROUTES.DASHBOARD
+  const from = (location.state as { from?: string } | null)?.from
 
   async function onSubmit(values: LoginFormValues) {
     setServerError(null)
@@ -60,7 +65,9 @@ export function LoginPage() {
         password: values.password,
       })
       setSession(user, token)
-      navigate(redirectTo, { replace: true })
+      // Respect an intended destination if the user was bounced here from one;
+      // otherwise send them to the default landing page for their role.
+      navigate(from ?? getDefaultRouteForRole(user.role), { replace: true })
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const message =
@@ -76,112 +83,125 @@ export function LoginPage() {
 
   return (
     <div className={styles.page}>
-      <aside className={styles.brandPanel}>
-        <div className={styles.brandHeader}>
+      {/* Left: quiet editorial zone — identity, one strong line, descriptor */}
+      <aside className={styles.leftPanel}>
+        <div className={styles.brand}>
           <span className={styles.brandMark}>
-            <Store size={20} strokeWidth={2} />
+            <BrandMark />
           </span>
-          <span>{APP_NAME}</span>
+          <span className={styles.brandName}>{APP_NAME}</span>
         </div>
 
-        <div className={styles.brandContent}>
-          <span className={styles.brandKicker}>
-            <Sparkles size={12} strokeWidth={2.5} />
-            Enterprise POS Platform
-          </span>
-          <h1 className={styles.brandTitle}>
-            Run every counter, channel, and warehouse from one place.
-          </h1>
-          <p className={styles.brandSubtitle}>
-            Sign in to manage inventory, ring up sales, and watch your stores
-            perform in real time.
-          </p>
-        </div>
+        <p className={styles.heroLine}>
+          Every store, every sale,
+          <br />
+          one source of truth.
+        </p>
 
-        <div className={styles.brandStats}>
-          <div className={styles.stat}>
-            <span className={styles.statValue}>240+</span>
-            <span className={styles.statLabel}>Stores</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statValue}>1.4M</span>
-            <span className={styles.statLabel}>Orders / mo</span>
-          </div>
-          <div className={styles.stat}>
-            <span className={styles.statValue}>99.99%</span>
-            <span className={styles.statLabel}>Uptime</span>
-          </div>
-        </div>
+        <p className={styles.leftFoot}>
+          Point of sale &amp; inventory for multi-store retail.
+        </p>
       </aside>
 
-      <section className={styles.formPanel}>
-        <div className={styles.formCard}>
+      {/* Right: the form */}
+      <section className={styles.rightPanel}>
+        <span className={styles.topNote}>
+          Need access?{' '}
+          <button
+            type="button"
+            className={styles.linkBtn}
+            onClick={() =>
+              toast('Account access', {
+                description:
+                  'Ask your administrator to create a Vendra account for you.',
+              })
+            }
+          >
+            Contact your admin
+          </button>
+        </span>
+
+        <div className={styles.column}>
           <div className={styles.mobileBrand}>
-            <Store size={18} strokeWidth={2.25} />
-            {APP_NAME}
+            <span className={styles.brandMark}>
+              <BrandMark />
+            </span>
+            <span className={styles.brandName}>{APP_NAME}</span>
           </div>
 
-          <div className={styles.heading}>
-            <h2 className={styles.title}>Sign in to your workspace</h2>
+          <div className={styles.intro}>
+            <h1 className={styles.title}>Sign in to {APP_NAME}</h1>
             <p className={styles.subtitle}>
-              Use the credentials provided by your administrator.
+              Manage inventory, sales, and every store from one workspace.
             </p>
           </div>
 
           {serverError ? (
             <div className={styles.alert} role="alert">
-              <AlertCircle size={16} strokeWidth={2} />
-              <span>{serverError}</span>
+              {serverError}
+            </div>
+          ) : sessionExpired ? (
+            <div className={styles.notice} role="status">
+              Your session expired. Please sign in again.
             </div>
           ) : null}
 
-          <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
+          <form
+            className={styles.form}
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+          >
             <div className={styles.field}>
               <label className={styles.label} htmlFor="email">
-                Work email
+                Email
               </label>
-              <div
-                className={[
-                  styles.inputWrap,
-                  errors.email ? styles.inputWrapError : '',
-                ]
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@vendra.app"
+                className={[styles.input, errors.email ? styles.inputError : '']
                   .filter(Boolean)
                   .join(' ')}
-              >
-                <Mail size={16} strokeWidth={2} aria-hidden="true" />
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@company.com"
-                  className={styles.input}
-                  {...register('email')}
-                />
-              </div>
+                {...register('email')}
+              />
               {errors.email ? (
                 <span className={styles.fieldError}>{errors.email.message}</span>
               ) : null}
             </div>
 
             <div className={styles.field}>
-              <label className={styles.label} htmlFor="password">
-                Password
-              </label>
+              <div className={styles.labelRow}>
+                <label className={styles.label} htmlFor="password">
+                  Password
+                </label>
+                <button
+                  type="button"
+                  className={styles.linkBtn}
+                  onClick={() =>
+                    toast('Password reset', {
+                      description:
+                        'Contact your administrator to reset your password.',
+                    })
+                  }
+                >
+                  Forgot password?
+                </button>
+              </div>
               <div
                 className={[
-                  styles.inputWrap,
-                  errors.password ? styles.inputWrapError : '',
+                  styles.passwordWrap,
+                  errors.password ? styles.inputError : '',
                 ]
                   .filter(Boolean)
                   .join(' ')}
               >
-                <Lock size={16} strokeWidth={2} aria-hidden="true" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
-                  placeholder="Enter your password"
-                  className={styles.input}
+                  placeholder="••••••••"
+                  className={styles.passwordInput}
                   {...register('password')}
                 />
                 <button
@@ -190,11 +210,7 @@ export function LoginPage() {
                   onClick={() => setShowPassword((v) => !v)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? (
-                    <EyeOff size={16} strokeWidth={2} />
-                  ) : (
-                    <Eye size={16} strokeWidth={2} />
-                  )}
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               {errors.password ? (
@@ -204,21 +220,10 @@ export function LoginPage() {
               ) : null}
             </div>
 
-            <div className={styles.row}>
-              <label className={styles.checkbox}>
-                <input type="checkbox" {...register('remember')} />
-                Keep me signed in
-              </label>
-              <button
-                type="button"
-                className={styles.linkBtn}
-                onClick={() =>
-                  alert('Please contact your administrator to reset your password.')
-                }
-              >
-                Forgot password?
-              </button>
-            </div>
+            <label className={styles.checkbox}>
+              <input type="checkbox" {...register('remember')} />
+              Keep me signed in
+            </label>
 
             <button
               type="submit"
@@ -226,32 +231,12 @@ export function LoginPage() {
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <>
-                  <span className={styles.spinner} aria-hidden="true" />
-                  Signing in…
-                </>
+                <span className={styles.spinner} aria-hidden="true" />
               ) : (
-                <>
-                  <LogIn size={16} strokeWidth={2.25} />
-                  Sign in
-                </>
+                'Sign in'
               )}
             </button>
           </form>
-
-          <div className={styles.divider}>
-            <ShieldCheck size={12} strokeWidth={2.5} />
-            Secured by JWT
-          </div>
-
-          <div className={styles.demoBox}>
-            <strong>Demo credentials</strong>
-            <span>admin@omnipos.com / Admin@12345</span>
-            <span>
-              Don&apos;t have an account? Ask an admin to create one via the Users
-              module.
-            </span>
-          </div>
         </div>
       </section>
     </div>

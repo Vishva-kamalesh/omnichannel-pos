@@ -19,6 +19,12 @@
   color: var(--color-text-muted);
 }
 
+.descriptionMono {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.01em;
+}
+
 .actions {
   display: flex;
   align-items: center;

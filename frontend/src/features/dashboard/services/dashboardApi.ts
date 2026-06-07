@@ -79,6 +79,8 @@ function formatRelative(iso: string): string {
 
 const STATUS_MAP: Record<string, Transaction['status']> = {
   completed: 'completed',
+  pending: 'pending',
+  processing: 'processing',
   cancelled: 'cancelled',
   returned: 'refunded',
 }

@@ -61,11 +61,11 @@ export function SalesChart({ data }: SalesChartProps) {
           />
           <Tooltip
             content={<ChartTooltip />}
-            cursor={{ fill: 'rgba(99, 102, 241, 0.06)' }}
+            cursor={{ fill: 'rgba(41, 94, 140, 0.08)' }}
           />
           <Bar
             dataKey="sales"
-            fill="#6366f1"
+            fill="#295e8c"
             radius={[3, 3, 0, 0]}
             maxBarSize={40}
           />

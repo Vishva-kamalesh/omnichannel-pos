@@ -1,7 +1,22 @@
+/* Headings use the display sans (IBM Plex Sans) with tightened tracking,
+   matching the login headline. */
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.02em;
+}
+
+/* Operational metadata: monospace all data-table column headers. */
+th {
+  font-family: var(--font-mono);
+}
+
 .pageTitle {
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
+  letter-spacing: -0.02em;
   color: var(--color-text-primary);
 }
 

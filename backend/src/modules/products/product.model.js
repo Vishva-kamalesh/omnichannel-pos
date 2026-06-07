@@ -69,9 +69,7 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-// Indexes for faster lookup
-productSchema.index({ sku: 1 });
-productSchema.index({ barcode: 1 });
+// Indexes for faster lookup (sku/barcode already indexed via unique: true)
 productSchema.index({ storeId: 1 });
 productSchema.index({ category: 1 });
 

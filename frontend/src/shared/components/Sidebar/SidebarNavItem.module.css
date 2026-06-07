@@ -23,7 +23,7 @@
 }
 
 .active .iconWrap {
-  color: var(--color-primary);
+  color: var(--color-sidebar-accent);
 }
 
 .iconWrap {
