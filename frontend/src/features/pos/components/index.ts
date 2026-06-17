@@ -1,5 +1,3 @@
+export { ProductImage } from './ProductImage'
+export { ProductTile } from './ProductTile'
 export { CartPanel } from './CartPanel'
-export { CategoryFilter } from './CategoryFilter'
-export type { CategoryId, CategoryOption } from './CategoryFilter'
-export { ProductGrid } from './ProductGrid'
-export { ProductSearch } from './ProductSearch'

@@ -13,9 +13,11 @@
 }
 
 .spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--color-border);
+  width: 28px;
+  height: 28px;
+  /* Visible track on dark surfaces (--color-border at 0.08 was invisible),
+     with the brand-orange head spinning over it. */
+  border: 3px solid rgba(255, 255, 255, 0.15);
   border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;

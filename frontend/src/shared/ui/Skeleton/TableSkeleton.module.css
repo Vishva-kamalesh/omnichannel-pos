@@ -1,0 +1,27 @@
+.wrap {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.head,
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+}
+
+.head {
+  background-color: var(--color-bg-elevated);
+}
+
+.row {
+  border-top: 1px solid var(--color-border);
+}
+
+.cell {
+  flex: 1;
+  min-width: 0;
+}

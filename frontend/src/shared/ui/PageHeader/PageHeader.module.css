@@ -7,10 +7,22 @@
 }
 
 .title {
-  font-size: var(--font-size-lg);
+  font-size: 1.35rem;
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-tight);
-  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+/* Solid white title for dark surfaces; overrides the gradient text fill. */
+.titleLight {
+  background: none;
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+}
+
+.descriptionLight {
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .description {

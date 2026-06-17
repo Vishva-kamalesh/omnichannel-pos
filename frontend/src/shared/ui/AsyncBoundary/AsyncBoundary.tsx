@@ -9,6 +9,8 @@ type AsyncBoundaryProps = {
   isEmpty?: boolean
   emptyMessage?: string
   onRetry?: () => void
+  /** Optional loading placeholder (e.g. <TableSkeleton />). Falls back to a spinner. */
+  skeleton?: ReactNode
   children: ReactNode
 }
 
@@ -26,9 +28,11 @@ export function AsyncBoundary({
   isEmpty,
   emptyMessage = 'Nothing to display yet.',
   onRetry,
+  skeleton,
   children,
 }: AsyncBoundaryProps) {
   if (loading) {
+    if (skeleton) return <>{skeleton}</>
     return (
       <div className={styles.state}>
         <span className={styles.spinner} aria-hidden="true" />

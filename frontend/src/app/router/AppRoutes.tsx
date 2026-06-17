@@ -6,6 +6,7 @@ import { InventoryPage } from '@/features/inventory'
 import { OrdersPage } from '@/features/orders'
 import { PosPage } from '@/features/pos'
 import { ProductsPage } from '@/features/products'
+import { ProfilePage } from '@/features/profile'
 import { UsersPage } from '@/features/users'
 import { DashboardLayout } from '@/shared/layouts/DashboardLayout'
 import { ROUTES, getDefaultRouteForRole } from '@/shared/constants'
@@ -39,6 +40,7 @@ export function AppRoutes() {
           <Route path={ROUTES.ORDERS} element={<OrdersPage />} />
           <Route path={ROUTES.ANALYTICS} element={<AnalyticsPage />} />
           <Route path={ROUTES.USERS} element={<UsersPage />} />
+          <Route path={ROUTES.PROFILE} element={<ProfilePage />} />
         </Route>
       </Route>
 

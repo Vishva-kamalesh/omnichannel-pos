@@ -3,6 +3,7 @@ import { Download, PackagePlus } from 'lucide-react'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { PageShell } from '@/shared/ui/PageShell'
 import { AsyncBoundary } from '@/shared/ui/AsyncBoundary'
+import { TableSkeleton } from '@/shared/ui/Skeleton'
 import { useAsync } from '@/shared/hooks/useAsync'
 import {
   getInventorySummary,
@@ -79,6 +80,7 @@ export function InventoryPage() {
         onRetry={refetch}
         isEmpty={!loading && !error && items.length === 0}
         emptyMessage="No inventory records yet. Receive stock to get started."
+        skeleton={<TableSkeleton rows={8} columns={6} />}
       >
         <InventorySummary metrics={summary} />
 

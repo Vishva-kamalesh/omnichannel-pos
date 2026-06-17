@@ -1,7 +1,7 @@
 .shell {
   display: flex;
   min-height: 100vh;
-  background-color: var(--color-bg-app);
+  background-color: #15151f;
 }
 
 .main {
@@ -21,6 +21,19 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  background-color: #15151f;
+  /* App-wide dark theme: this is the ONE place light→dark is flipped.
+     Redefining these surface/text/border tokens cascades the dark palette
+     to every token-based page. The brand accent (--color-primary) is the
+     same orange in both themes, so it is not redefined here. */
+  --color-bg-app: #15151f;
+  --color-bg-surface: #1e1e2e;
+  --color-bg-elevated: #232334;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-muted: rgba(255, 255, 255, 0.55);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
 }
 
 @media (max-width: 1024px) {

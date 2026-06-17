@@ -10,6 +10,66 @@
   flex-wrap: wrap;
 }
 
+/* Add user (admin) — header action */
+.addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 36px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: #ffffff;
+  background-color: #f4622a;
+  transition: background-color var(--transition-fast);
+}
+
+.addBtn:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Row actions (admin) */
+.actionsHead,
+.actionsCell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.removeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg-app);
+  transition: background-color var(--transition-fast),
+    border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.removeBtn:hover:not(:disabled) {
+  border-color: rgba(239, 68, 68, 0.5);
+  background-color: rgba(239, 68, 68, 0.12);
+  color: var(--color-danger);
+}
+
+.removeBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.selfTag,
+.removedTag {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+}
+
 .search {
   display: flex;
   align-items: center;
@@ -49,51 +109,18 @@
   border-radius: var(--radius-md);
   background-color: var(--color-bg-app);
   font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
   cursor: pointer;
 }
 
-.tableWrap {
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 0 0 var(--radius-md) var(--radius-md);
-  overflow: hidden;
+.select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-muted);
 }
 
-.scroll {
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--font-size-sm);
-}
-
-.table thead {
-  background-color: var(--color-bg-app);
-}
-
-.table th {
-  padding: var(--space-3) var(--space-4);
-  text-align: left;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.table td {
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  color: var(--color-text-primary);
-  vertical-align: middle;
-}
-
-.table tbody tr:last-child td {
-  border-bottom: none;
-}
+/* Table chrome (scroll wrapper, header, row borders/hover) now lives in the
+   shared <DataTable> component. Only bespoke cell styles remain below. */
 
 .userCell {
   display: flex;
@@ -107,11 +134,13 @@
   justify-content: center;
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-md);
-  background-color: var(--color-primary);
-  color: #ffffff;
+  flex-shrink: 0;
+  border-radius: 50%;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  background: var(--gradient-brand);
 }
 
 .name {
@@ -135,22 +164,12 @@
   text-transform: capitalize;
 }
 
-.badgeAdmin {
-  background-color: #ede9fe;
-  color: #6d28d9;
-  border: 1px solid #ddd6fe;
-}
-
-.badgeManager {
-  background-color: #dbeafe;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
-}
-
-.badgeCashier {
-  background-color: #e0f2fe;
-  color: #0369a1;
-  border: 1px solid #bae6fd;
+/* Role badges use the brand orange across all roles; the label text carries
+   the role distinction. */
+.badgeRole {
+  background-color: rgba(244, 98, 42, 0.16);
+  color: #f4622a;
+  border: 1px solid rgba(244, 98, 42, 0.4);
 }
 
 .dot {

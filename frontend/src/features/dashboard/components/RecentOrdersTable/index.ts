@@ -1,1 +1,0 @@
-export { RecentOrdersTable } from './RecentOrdersTable'

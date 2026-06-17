@@ -13,7 +13,7 @@
 .card {
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   padding: var(--space-4);
 }
 
@@ -51,7 +51,7 @@
   padding: 6px 12px;
   border: none;
   background-color: var(--color-bg-app);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -80,7 +80,8 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-elevated);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .table td {

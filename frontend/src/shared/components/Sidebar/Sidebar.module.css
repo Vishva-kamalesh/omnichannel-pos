@@ -54,6 +54,8 @@
   border-radius: var(--radius-md);
   color: #ffffff;
   background-color: var(--color-primary);
+  background-image: var(--gradient-brand);
+  box-shadow: 0 2px 10px rgba(244, 98, 42, 0.5);
 }
 
 .logoText {

@@ -83,44 +83,8 @@ export function LoginPage() {
 
   return (
     <div className={styles.page}>
-      {/* Left: quiet editorial zone — identity, one strong line, descriptor */}
-      <aside className={styles.leftPanel}>
-        <div className={styles.brand}>
-          <span className={styles.brandMark}>
-            <BrandMark />
-          </span>
-          <span className={styles.brandName}>{APP_NAME}</span>
-        </div>
-
-        <p className={styles.heroLine}>
-          Every store, every sale,
-          <br />
-          one source of truth.
-        </p>
-
-        <p className={styles.leftFoot}>
-          Point of sale &amp; inventory for multi-store retail.
-        </p>
-      </aside>
-
-      {/* Right: the form */}
+      {/* Centered form card on the full-page brand backdrop. */}
       <section className={styles.rightPanel}>
-        <span className={styles.topNote}>
-          Need access?{' '}
-          <button
-            type="button"
-            className={styles.linkBtn}
-            onClick={() =>
-              toast('Account access', {
-                description:
-                  'Ask your administrator to create a Vendra account for you.',
-              })
-            }
-          >
-            Contact your admin
-          </button>
-        </span>
-
         <div className={styles.column}>
           <div className={styles.mobileBrand}>
             <span className={styles.brandMark}>
@@ -177,7 +141,7 @@ export function LoginPage() {
                 </label>
                 <button
                   type="button"
-                  className={styles.linkBtn}
+                  className={`${styles.linkBtn} ${styles.linkOrange}`}
                   onClick={() =>
                     toast('Password reset', {
                       description:
@@ -237,6 +201,22 @@ export function LoginPage() {
               )}
             </button>
           </form>
+
+          <p className={styles.belowNote}>
+            Need access?{' '}
+            <button
+              type="button"
+              className={styles.linkBtn}
+              onClick={() =>
+                toast('Account access', {
+                  description:
+                    'Ask your administrator to create a Vendra account for you.',
+                })
+              }
+            >
+              Contact your admin
+            </button>
+          </p>
         </div>
       </section>
     </div>

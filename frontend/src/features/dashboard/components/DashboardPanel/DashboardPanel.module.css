@@ -3,6 +3,32 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* Dark variant — matches the dark dashboard surface. Redefining the theme
+   tokens here flips all child text/borders to light automatically. */
+.panelDark {
+  background-color: #1e1e2e;
+  border-color: #2a2a3a;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.78);
+  --color-text-muted: rgba(255, 255, 255, 0.55);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-bg-app: rgba(255, 255, 255, 0.05);
+  --color-bg-surface: #1e1e2e;
+}
+
+.panelDark .header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.panelDark .title {
+  color: #ffffff;
+}
+
+.panelDark .meta {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .header {

@@ -1,30 +1,34 @@
 import { useState } from 'react'
-import { Search } from 'lucide-react'
+import { Search, Trash2, UserPlus } from 'lucide-react'
+import { toast } from 'sonner'
+import axios from 'axios'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { PageShell } from '@/shared/ui/PageShell'
 import { AsyncBoundary } from '@/shared/ui/AsyncBoundary'
+import { TableSkeleton } from '@/shared/ui/Skeleton'
+import { DataTable } from '@/shared/ui/DataTable'
 import { useAsync } from '@/shared/hooks/useAsync'
+import { useAuthStore } from '@/features/auth'
 import { usersApi } from '../services/usersApi'
+import { UserFormModal } from '../components/UserFormModal'
 import styles from './UsersPage.module.css'
 
+/** Up to two initials from a name, for the avatar chip. */
 function initials(name: string): string {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() ?? '')
-    .join('')
-}
-
-const ROLE_STYLE: Record<string, string> = {
-  admin: 'badgeAdmin',
-  manager: 'badgeManager',
-  cashier: 'badgeCashier',
+  const words = name.trim().split(/\s+/).filter(Boolean)
+  if (words.length === 0) return '?'
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
+  return (words[0][0] + words[1][0]).toUpperCase()
 }
 
 export function UsersPage() {
   const [search, setSearch] = useState('')
   const [role, setRole] = useState('')
+  const [addOpen, setAddOpen] = useState(false)
+  const [removingId, setRemovingId] = useState<string | null>(null)
+
+  const currentUser = useAuthStore((s) => s.user)
+  const isAdmin = currentUser?.role === 'admin'
 
   const { data, loading, error, status, refetch } = useAsync(
     () =>
@@ -38,11 +42,51 @@ export function UsersPage() {
   const users = data?.users ?? []
   const total = data?.pagination.total ?? 0
 
+  async function handleDeactivate(id: string, name: string) {
+    if (
+      !window.confirm(
+        `Deactivate ${name}? They will lose access immediately. You can re-enable them later from the backend.`,
+      )
+    ) {
+      return
+    }
+    setRemovingId(id)
+    try {
+      await usersApi.deactivate(id)
+      toast.success('User deactivated', { description: `${name} can no longer sign in.` })
+      await refetch()
+    } catch (err) {
+      let message = 'Could not deactivate the user. Please try again.'
+      if (axios.isAxiosError(err)) {
+        message =
+          (err.response?.data as { message?: string } | undefined)?.message ??
+          err.message
+      } else if (err instanceof Error) {
+        message = err.message
+      }
+      toast.error('Action failed', { description: message })
+    } finally {
+      setRemovingId(null)
+    }
+  }
+
   return (
     <PageShell>
       <PageHeader
         title="Users"
         description={`${total} staff member${total !== 1 ? 's' : ''} across all stores`}
+        actions={
+          isAdmin ? (
+            <button
+              type="button"
+              className={styles.addBtn}
+              onClick={() => setAddOpen(true)}
+            >
+              <UserPlus size={15} strokeWidth={2} aria-hidden="true" />
+              Add user
+            </button>
+          ) : undefined
+        }
       />
 
       <div className={styles.toolbar}>
@@ -75,76 +119,107 @@ export function UsersPage() {
         onRetry={refetch}
         isEmpty={!loading && !error && users.length === 0}
         emptyMessage="No users found."
+        skeleton={<TableSkeleton rows={8} columns={isAdmin ? 6 : 5} />}
       >
-        <div className={styles.tableWrap}>
-          <div className={styles.scroll}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Role</th>
-                  <th>Store</th>
-                  <th>Status</th>
-                  <th>Joined</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => {
-                  const storeName =
-                    typeof user.storeId === 'object' && user.storeId
-                      ? user.storeId.name
-                      : '—'
-                  return (
-                    <tr key={user._id}>
-                      <td>
-                        <div className={styles.userCell}>
-                          <span className={styles.avatar}>
-                            {initials(user.name)}
-                          </span>
-                          <div>
-                            <span className={styles.name}>{user.name}</span>
-                            <span className={styles.email}>{user.email}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <span
-                          className={[
-                            styles.badge,
-                            styles[ROLE_STYLE[user.role] ?? 'badgeCashier'],
-                          ].join(' ')}
+        <DataTable<(typeof users)[number]>
+          data={users}
+          rowKey={(u) => u._id}
+          columns={[
+            {
+              key: 'user',
+              header: 'User',
+              render: (u) => (
+                <div className={styles.userCell}>
+                  <span className={styles.avatar} aria-hidden="true">
+                    {initials(u.name)}
+                  </span>
+                  <div>
+                    <span className={styles.name}>{u.name}</span>
+                    <span className={styles.email}>{u.email}</span>
+                  </div>
+                </div>
+              ),
+            },
+            {
+              key: 'role',
+              header: 'Role',
+              render: (u) => (
+                <span className={[styles.badge, styles.badgeRole].join(' ')}>
+                  {u.role}
+                </span>
+              ),
+            },
+            {
+              key: 'store',
+              header: 'Store',
+              render: (u) =>
+                typeof u.storeId === 'object' && u.storeId
+                  ? u.storeId.name
+                  : '—',
+            },
+            {
+              key: 'status',
+              header: 'Status',
+              render: (u) => (
+                <span
+                  className={[
+                    styles.dot,
+                    u.isActive ? styles.statusActive : styles.statusInactive,
+                  ].join(' ')}
+                >
+                  {u.isActive ? 'Active' : 'Inactive'}
+                </span>
+              ),
+            },
+            {
+              key: 'joined',
+              header: 'Joined',
+              render: (u) =>
+                new Date(u.createdAt).toLocaleDateString('en-IN', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                }),
+            },
+            ...(isAdmin
+              ? [
+                  {
+                    key: 'actions',
+                    header: 'Actions',
+                    headerClassName: styles.actionsHead,
+                    cellClassName: styles.actionsCell,
+                    render: (u: (typeof users)[number]) =>
+                      u._id === currentUser?._id ? (
+                        <span className={styles.selfTag}>You</span>
+                      ) : u.isActive ? (
+                        <button
+                          type="button"
+                          className={styles.removeBtn}
+                          onClick={() => handleDeactivate(u._id, u.name)}
+                          disabled={removingId === u._id}
+                          title={`Deactivate ${u.name}`}
+                          aria-label={`Deactivate ${u.name}`}
                         >
-                          {user.role}
-                        </span>
-                      </td>
-                      <td>{storeName}</td>
-                      <td>
-                        <span
-                          className={[
-                            styles.dot,
-                            user.isActive
-                              ? styles.statusActive
-                              : styles.statusInactive,
-                          ].join(' ')}
-                        >
-                          {user.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                      </td>
-                      <td>
-                        {new Date(user.createdAt).toLocaleDateString('en-IN', {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                          <Trash2 size={15} strokeWidth={2} />
+                          {removingId === u._id ? 'Removing…' : 'Remove'}
+                        </button>
+                      ) : (
+                        <span className={styles.removedTag}>Deactivated</span>
+                      ),
+                  },
+                ]
+              : []),
+          ]}
+        />
       </AsyncBoundary>
+
+      {isAdmin ? (
+        <UserFormModal
+          open={addOpen}
+          onClose={() => setAddOpen(false)}
+          onCreated={refetch}
+        />
+      ) : null}
     </PageShell>
   )
 }

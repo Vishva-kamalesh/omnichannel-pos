@@ -1,36 +1,68 @@
 :root {
-  /* Brand — steel blue (matches the login accent) */
-  --color-primary: #295e8c;
-  --color-primary-hover: #1f4a6d;
-  --color-primary-muted: #e6eef5;
-  /* Brightened steel for the active state on the dark sidebar, where the base
-     #295e8c is too low-contrast against warm charcoal to read clearly. */
-  --color-sidebar-accent: #6ea6da;
+  /* Brand — Vendra orange. A single brand accent used across the whole
+     product: CTAs, focus rings, active states, logo. One source of truth,
+     so there is no competing steel-blue/purple brand anywhere. */
+  --color-primary: #f4622a;
+  --color-primary-hover: #d94d18;
+  --color-primary-muted: rgba(244, 98, 42, 0.16);
+  --color-sidebar-accent: #f4622a;
+  --color-brand-orange: #f4622a;
   --color-success: #22c55e;
   --color-danger: #ef4444;
   --color-warning: #f59e0b;
+
+  /* Categorical accents — rotated across KPIs, chart series, category chips.
+     Each pairs a saturated ink with a soft tint that reads on warm paper. */
+  --color-accent-blue: #2563eb;
+  --color-accent-blue-soft: #e7effd;
+  --color-accent-violet: #7c3aed;
+  --color-accent-violet-soft: #f0ebfd;
+  --color-accent-teal: #0d9488;
+  --color-accent-teal-soft: #d8f1ee;
+  --color-accent-amber: #d97706;
+  --color-accent-amber-soft: #fdeed8;
+  --color-accent-rose: #e11d48;
+  --color-accent-rose-soft: #fce3ea;
+  --color-accent-emerald: #059669;
+  --color-accent-emerald-soft: #d8f2e7;
+
+  /* Stat-card accent rotation — shared by the dashboard KPI cards and the
+     inventory summary cards so both pull from one source (orange/blue/
+     green/yellow). Theme-independent: not overridden in the dark scope. */
+  --color-stat-1: var(--color-brand-orange);
+  --color-stat-2: var(--color-accent-blue);
+  --color-stat-3: var(--color-success);
+  --color-stat-4: var(--color-warning);
+
+  /* Brand gradient — the one mark used by the logo + avatars everywhere
+     (login, sidebar, navbar). Orange family, matching --color-primary. */
+  --gradient-brand: linear-gradient(135deg, #f7841f 0%, #f4622a 100%);
+  /* Banner gradient — empty/placeholder hero bands only. */
+  --gradient-banner: linear-gradient(120deg, #f7841f 0%, #f4622a 60%, #d94d18 100%);
 
   /* Surfaces — warm off-white / paper (no pure white) */
   --color-bg-app: #f1ebe0;
   --color-bg-surface: #faf6ee;
   --color-bg-elevated: #faf6ee;
-  /* Temperature-neutral near-black (equal R/G/B) — no cool or warm cast. */
-  --color-bg-sidebar: #181818;
-  --color-bg-sidebar-hover: #262626;
-  --color-bg-sidebar-active: #303030;
+  /* Consistent dark chrome shared by the sidebar and navbar. Hover/active are
+     translucent white so they read against the flat dark. */
+  --color-bg-sidebar: #1e1e2e;
+  --color-bg-sidebar-hover: rgba(255, 255, 255, 0.08);
+  /* Active tint sits clearly above hover so the current page is unambiguous. */
+  --color-bg-sidebar-active: rgba(244, 98, 42, 0.24);
 
   /* Text — warm charcoal */
   --color-text-primary: #211e1a;
   --color-text-secondary: #514a3f;
   --color-text-muted: #8a8276;
   --color-text-inverse: #f6f2ea;
-  --color-text-sidebar: #9b9b9b;
-  --color-text-sidebar-active: #f4f4f5;
+  --color-text-sidebar: rgba(255, 255, 255, 0.72);
+  --color-text-sidebar-active: #ffffff;
 
   /* Borders — warm taupe */
   --color-border: #e6ddcd;
   --color-border-strong: #d4c9b6;
-  --color-border-sidebar: #2c2c2c;
+  --color-border-sidebar: rgba(255, 255, 255, 0.16);
 
   /* Layout */
   --sidebar-width: 240px;

@@ -1,20 +1,18 @@
 import { useMemo, useState } from 'react'
-import { Store } from 'lucide-react'
+import type { KeyboardEvent } from 'react'
+import { Search, Store, X } from 'lucide-react'
 import { CATEGORIES } from '../data/posMock'
 import { posApi } from '../services/posApi'
 import { useCartStore } from '../store/cartStore'
 import { useAuthStore } from '@/features/auth'
 import { useAsync } from '@/shared/hooks/useAsync'
 import { AsyncBoundary } from '@/shared/ui/AsyncBoundary'
-import type { Product, ScanResult, StoreOption } from '../types/pos.types'
-import {
-  CartPanel,
-  CategoryFilter,
-  ProductGrid,
-  ProductSearch,
-} from '../components'
-import type { CategoryId, CategoryOption } from '../components'
+import type { Product, ProductCategory, StoreOption } from '../types/pos.types'
+import { CartPanel, ProductTile } from '../components'
 import styles from './PosPage.module.css'
+
+type CategoryId = 'all' | ProductCategory
+type CategoryOption = { id: CategoryId; label: string; count: number }
 
 export function PosPage() {
   const [query, setQuery] = useState('')
@@ -23,8 +21,7 @@ export function PosPage() {
   const addProduct = useCartStore((s) => s.addProduct)
   const user = useAuthStore((s) => s.user)
 
-  // Cashiers/managers are bound to their own store; an admin floats and chooses
-  // one from the header picker. Either way the terminal needs a concrete store.
+  // Cashiers/managers are bound to their store; an admin picks one in the header.
   const fixedStoreId = user?.storeId
 
   const {
@@ -43,25 +40,23 @@ export function PosPage() {
     async () => (storeId ? posApi.listProductsWithStock(storeId) : []),
     [storeId],
   )
-
   const products = data ?? []
 
   const categoryOptions = useMemo<CategoryOption[]>(() => {
     const options: CategoryOption[] = [
-      { id: 'all', label: 'All items', count: products.length },
+      { id: 'all', label: 'All', count: products.length },
     ]
     for (const meta of CATEGORIES) {
       options.push({
         id: meta.id,
         label: meta.label,
-        accent: meta.accent,
         count: products.filter((p) => p.category === meta.id).length,
       })
     }
     return options
   }, [products])
 
-  const filteredProducts = useMemo(() => {
+  const filtered = useMemo(() => {
     const term = query.trim().toLowerCase()
     return products.filter((product) => {
       if (category !== 'all' && product.category !== category) return false
@@ -74,32 +69,26 @@ export function PosPage() {
     })
   }, [query, category, products])
 
-  function findProductByCode(rawCode: string): Product | undefined {
-    const code = rawCode.trim().toLowerCase()
-    if (!code) return undefined
-    return products.find(
+  // Enter on an exact barcode/SKU match adds it straight to the cart (scan flow).
+  function handleSearchKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key !== 'Enter') return
+    const code = query.trim().toLowerCase()
+    if (!code) return
+    const match = products.find(
       (p) => p.barcode === code || p.sku.toLowerCase() === code,
     )
-  }
-
-  function handleBarcode(code: string): ScanResult {
-    const product = findProductByCode(code)
-    if (!product) return { status: 'not-found' }
-    const inCart =
-      useCartStore
-        .getState()
-        .lines.find((l) => l.product.id === product.id)?.quantity ?? 0
-    if (inCart >= product.stock) return { status: 'out-of-stock', product }
-    addProduct(product)
-    return { status: 'added', product }
+    if (match && match.stock > 0) {
+      addProduct(match)
+      setQuery('')
+    }
   }
 
   return (
     <div className={styles.page}>
-      <header className={styles.terminalHeader}>
+      <header className={styles.header}>
         <div className={styles.headerLeft}>
-          <h1 className={styles.terminalTitle}>POS Terminal</h1>
-          <span className={styles.terminalMeta}>Register 02</span>
+          <h1 className={styles.title}>POS Terminal</h1>
+          <span className={styles.meta}>Register 02</span>
         </div>
 
         <div className={styles.storePicker}>
@@ -139,18 +128,54 @@ export function PosPage() {
       <div className={styles.body}>
         <section className={styles.catalog} aria-label="Product catalog">
           <div className={styles.catalogHeader}>
-            <ProductSearch
-              query={query}
-              onQueryChange={setQuery}
-              onBarcodeSubmit={handleBarcode}
-            />
-            <CategoryFilter
-              options={categoryOptions}
-              active={category}
-              onChange={setCategory}
-              resultCount={filteredProducts.length}
-            />
+            <div className={styles.search}>
+              <Search size={16} strokeWidth={2} aria-hidden="true" />
+              <input
+                className={styles.searchInput}
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
+                placeholder="Search products or scan a barcode…"
+                aria-label="Search products"
+              />
+              {query ? (
+                <button
+                  type="button"
+                  className={styles.clear}
+                  onClick={() => setQuery('')}
+                  aria-label="Clear search"
+                >
+                  <X size={15} strokeWidth={2} />
+                </button>
+              ) : null}
+            </div>
+
+            <div
+              className={styles.chips}
+              role="group"
+              aria-label="Filter products by category"
+            >
+              {categoryOptions.map((option) => {
+                const isActive = option.id === category
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    aria-pressed={isActive}
+                    className={[styles.chip, isActive ? styles.chipActive : '']
+                      .filter(Boolean)
+                      .join(' ')}
+                    onClick={() => setCategory(option.id)}
+                  >
+                    {option.label}
+                    <span className={styles.chipCount}>{option.count}</span>
+                  </button>
+                )
+              })}
+            </div>
           </div>
+
           <div className={styles.catalogBody}>
             <AsyncBoundary
               loading={storesLoading || loading}
@@ -160,11 +185,13 @@ export function PosPage() {
                 !loading &&
                 !storesError &&
                 !error &&
-                products.length === 0
+                filtered.length === 0
               }
               emptyMessage={
                 storeId
-                  ? 'No products available for this store yet.'
+                  ? products.length === 0
+                    ? 'No products available for this store yet.'
+                    : 'No products match your search.'
                   : 'Select a store to start a sale.'
               }
               onRetry={() => {
@@ -172,7 +199,11 @@ export function PosPage() {
                 refetch()
               }}
             >
-              <ProductGrid products={filteredProducts} />
+              <div className={styles.grid}>
+                {filtered.map((product) => (
+                  <ProductTile key={product.id} product={product} />
+                ))}
+              </div>
             </AsyncBoundary>
           </div>
         </section>

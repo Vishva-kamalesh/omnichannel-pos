@@ -14,9 +14,10 @@
   --line: #e3dccf;
   --line-strong: #cfc6b6;
 
-  /* --- single accent (swap this one line to retune) --- */
-  --accent: #295e8c; /* Steel blue */
-  --accent-ring: rgba(41, 94, 140, 0.18);
+  /* --- single accent: Vendra brand orange (swap this one line to retune) --- */
+  --accent: #f4622a;
+  --accent-hover: #d94d18;
+  --accent-ring: rgba(244, 98, 42, 0.2);
 
   --sans: 'IBM Plex Sans', system-ui, sans-serif;
   --mono: 'IBM Plex Mono', ui-monospace, monospace;
@@ -26,79 +27,66 @@
   grid-template-columns: 1fr;
   font-family: var(--sans);
   color: var(--ink);
-  background-color: var(--paper);
+  /* Retail backdrop: a real store photo, darkened by a gradient overlay and
+     lifted by the orange brand glow so the glass card stays legible. The solid
+     background-color is the fallback if the photo ever fails to load. */
+  background-color: #15151f;
+  background-image: radial-gradient(
+      900px 500px at 85% -5%,
+      rgba(244, 98, 42, 0.28),
+      transparent 60%
+    ),
+    radial-gradient(800px 600px at 0% 105%, rgba(244, 98, 42, 0.12), transparent 55%),
+    linear-gradient(
+      160deg,
+      rgba(20, 19, 30, 0.82) 0%,
+      rgba(18, 16, 25, 0.9) 55%,
+      rgba(15, 13, 22, 0.95) 100%
+    ),
+    url('https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=2000&q=80');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
-/* Asymmetric split: left zone gets a little more room, but it's mostly
-   negative space, so the two sides read as balanced rather than 50/50. */
-@media (min-width: 920px) {
-  .page {
-    grid-template-columns: 1.1fr 0.9fr;
-  }
-}
-
-/* ---------- Left: quiet editorial zone ---------- */
-.leftPanel {
-  display: none;
-}
-
-@media (min-width: 920px) {
-  .leftPanel {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: clamp(40px, 6vw, 72px);
-    border-right: 1px solid var(--line);
-  }
-}
-
-.heroLine {
-  margin: 0;
-  font-size: clamp(1.65rem, 3.2vw, 2.6rem);
-  line-height: 1.12;
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  color: var(--ink);
-  /* Break only at the explicit <br>, so the phrasing stays clean:
-     "Every store, every sale," / "one source of truth." */
-  white-space: nowrap;
-}
-
-.leftFoot {
-  max-width: 30ch;
-  margin: 0;
-  font-family: var(--mono);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-normal);
-  letter-spacing: 0.02em;
-  color: var(--ink-muted);
-}
-
-/* ---------- Right: form zone ---------- */
+/* ---------- Form zone ---------- */
+/* Spans the single full-width column and centers the card on the whole page. */
 .rightPanel {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
   padding: var(--space-6);
+  background-color: transparent;
 }
 
-.topNote {
-  align-self: flex-end;
-  font-size: var(--font-size-sm);
-  color: var(--ink-muted);
-}
-
-/* Centers the form in the space left under the top note. */
+/* White card, vertically + horizontally centered on the page. */
 .column {
   width: 100%;
-  max-width: 348px;
-  margin: auto;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: clamp(var(--space-6), 4vw, 40px);
+  /* Dark frosted glass so the card belongs on the dim retail photo. */
+  background-color: rgba(18, 16, 14, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(22px) saturate(130%);
+  -webkit-backdrop-filter: blur(22px) saturate(130%);
+  /* Flip the card's local theme to light-on-dark; children read these vars. */
+  --ink: #f6f6f8;
+  --ink-soft: rgba(255, 255, 255, 0.82);
+  /* 0.66 (not 0.58) so subtitle/labels clear WCAG AA on the glass card. */
+  --ink-muted: rgba(255, 255, 255, 0.66);
 }
 
-@media (min-width: 920px) {
-  .column {
-    margin-left: clamp(var(--space-6), 6vw, 80px);
-    margin-right: auto;
-  }
+.belowNote {
+  margin: var(--space-5) 0 0;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--ink-soft);
 }
 
 .brand {
@@ -114,8 +102,10 @@
   width: 30px;
   height: 30px;
   border-radius: var(--radius-md);
-  color: var(--paper);
-  background-color: var(--ink);
+  color: #ffffff;
+  background-color: var(--accent);
+  background-image: var(--gradient-brand);
+  box-shadow: 0 4px 12px rgba(244, 98, 42, 0.4);
 }
 
 .brandName {
@@ -126,17 +116,12 @@
 }
 
 /* Compact brand shown above the form on mobile (left panel is hidden). */
+/* Brand shown above the form on every viewport now that the side panel is gone. */
 .mobileBrand {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   margin-bottom: var(--space-6);
-}
-
-@media (min-width: 920px) {
-  .mobileBrand {
-    display: none;
-  }
 }
 
 .intro {
@@ -154,9 +139,9 @@
 
 .subtitle {
   margin: 0;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-sm);
   line-height: var(--line-height-normal);
-  color: var(--ink-soft);
+  color: var(--ink-muted);
 }
 
 /* ---------- Form ---------- */
@@ -169,7 +154,7 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .labelRow {
@@ -188,17 +173,15 @@
   color: var(--ink-soft);
 }
 
-/* Soft-filled inputs with a stronger baseline so they sit on the page. */
+/* Dark translucent inputs that sit inside the glass card. */
 .input,
 .passwordWrap {
   height: 42px;
-  background-color: var(--paper-raised);
-  border: 1px solid var(--line);
-  border-bottom-width: 2px;
-  border-bottom-color: var(--line-strong);
-  border-radius: var(--radius-md);
-  transition: background-color var(--transition-fast),
-    border-color var(--transition-fast), box-shadow var(--transition-fast);
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  transition: border-color var(--transition-fast),
+    box-shadow var(--transition-fast), background-color var(--transition-fast);
 }
 
 .input {
@@ -215,16 +198,15 @@
 
 .input:hover,
 .passwordWrap:hover {
-  border-color: var(--line-strong);
+  border-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
-/* focus ring = the single accent */
+/* focus ring = the single brand accent */
 .input:focus,
 .passwordWrap:focus-within {
   outline: none;
-  background-color: var(--paper-raised);
   border-color: var(--accent);
-  border-bottom-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-ring);
 }
 
@@ -308,29 +290,37 @@
   text-decoration-thickness: 2px;
 }
 
+/* Forgot-password link uses the Vendra brand orange. */
+.linkOrange {
+  color: #f4622a;
+}
+
 .submitBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 44px;
   margin-top: var(--space-1);
-  border-radius: var(--radius-md);
-  background-color: var(--ink);
-  color: var(--paper);
+  border-radius: 12px;
+  background-color: var(--accent);
+  color: #ffffff;
   font-size: var(--font-size-base);
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
+  box-shadow: 0 8px 22px rgba(244, 98, 42, 0.42);
   transition: background-color var(--transition-fast),
-    transform var(--transition-fast);
+    transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-/* button hover = the single accent */
 .submitBtn:hover:not(:disabled) {
-  background-color: var(--accent);
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(244, 98, 42, 0.52);
 }
 
 .submitBtn:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(0);
+  box-shadow: 0 6px 16px rgba(244, 98, 42, 0.42);
 }
 
 .submitBtn:disabled {
@@ -354,18 +344,9 @@
   padding: var(--space-3);
   border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
-  background-color: var(--accent-ring);
-  border: 1px solid var(--accent);
-  color: var(--accent);
-}
-
-.footnote {
-  margin: var(--space-6) 0 0;
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--line);
-  font-family: var(--mono);
-  font-size: var(--font-size-xs);
-  color: var(--ink-muted);
+  background-color: rgba(244, 98, 42, 0.16);
+  border: 1px solid rgba(244, 98, 42, 0.55);
+  color: #ffd9c7;
 }
 
 .spinner {

@@ -63,6 +63,11 @@ export function getColorHex(name: string): string {
   return COLOR_HEX.get(name) ?? '#9ca3af'
 }
 
+/** Whether a color name maps to a real swatch color (vs. a synthetic/unknown one). */
+export function hasColorHex(name: string): boolean {
+  return COLOR_HEX.has(name)
+}
+
 type RawProduct = {
   name: string
   category: string

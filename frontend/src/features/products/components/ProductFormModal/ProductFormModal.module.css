@@ -63,7 +63,7 @@
 
 .inputError:focus {
   border-color: var(--color-danger);
-  box-shadow: 0 0 0 3px #fef2f2;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
 }
 
 .error {
@@ -147,8 +147,8 @@
 }
 
 .removeVariant:hover:not(:disabled) {
-  background-color: #fef2f2;
-  border-color: #fecaca;
+  background-color: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.35);
   color: var(--color-danger);
 }
 
@@ -180,14 +180,18 @@
 }
 
 .submitBtn {
-  border: 1px solid var(--color-primary);
+  border: none;
   color: #ffffff;
   background-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(244, 98, 42, 0.3);
+  transition: background-color var(--transition-fast),
+    box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
 .submitBtn:hover {
   background-color: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
+  box-shadow: 0 6px 16px rgba(244, 98, 42, 0.4);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 560px) {

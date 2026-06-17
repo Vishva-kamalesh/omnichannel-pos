@@ -8,7 +8,7 @@ type TopSellingProductsProps = {
 
 export function TopSellingProducts({ products }: TopSellingProductsProps) {
   return (
-    <DashboardPanel title="Top selling products" meta="Last 30 days">
+    <DashboardPanel title="Top selling products" meta="Last 30 days" dark>
       <ol className={styles.list}>
         {products.map((product, index) => (
           <li key={product.id} className={styles.item}>
