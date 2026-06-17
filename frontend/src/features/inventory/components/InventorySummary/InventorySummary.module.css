@@ -6,13 +6,34 @@
 }
 
 .card {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
+  color: var(--color-text-primary);
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border);
+  /* Colored top accent matching the dashboard KPI cards. */
+  border-top: 3px solid var(--c);
   border-radius: var(--radius-lg);
+}
+
+/* Rotate each card through the shared stat palette: orange / blue / green / yellow. */
+.card:nth-child(4n + 1) {
+  --c: var(--color-stat-1);
+}
+
+.card:nth-child(4n + 2) {
+  --c: var(--color-stat-2);
+}
+
+.card:nth-child(4n + 3) {
+  --c: var(--color-stat-3);
+}
+
+.card:nth-child(4n) {
+  --c: var(--color-stat-4);
 }
 
 .iconWrap {
@@ -23,13 +44,14 @@
   height: 32px;
   flex-shrink: 0;
   border-radius: var(--radius-md);
-  color: var(--color-text-secondary);
-  background-color: var(--color-bg-app);
+  color: var(--c);
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
+/* Semantic tone override — keep warning icons amber regardless of rotation. */
 .iconWarning {
-  color: #b45309;
-  background-color: #fff7ed;
+  color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.16);
 }
 
 .body {
@@ -39,7 +61,7 @@
 .label {
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
-  color: var(--color-text-muted);
+  color: var(--color-text-secondary);
 }
 
 .value {

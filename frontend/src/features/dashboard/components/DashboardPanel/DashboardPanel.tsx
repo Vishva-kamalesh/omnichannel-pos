@@ -7,6 +7,8 @@ type DashboardPanelProps = {
   actions?: ReactNode
   children: ReactNode
   noPadding?: boolean
+  /** Dark-themed panel (e.g. on the dark dashboard surface). */
+  dark?: boolean
 }
 
 export function DashboardPanel({
@@ -15,11 +17,15 @@ export function DashboardPanel({
   actions,
   children,
   noPadding = false,
+  dark = false,
 }: DashboardPanelProps) {
   const bodyClass = noPadding ? styles.bodyFlush : styles.body
+  const panelClass = [styles.panel, dark ? styles.panelDark : '']
+    .filter(Boolean)
+    .join(' ')
 
   return (
-    <section className={styles.panel}>
+    <section className={panelClass}>
       <header className={styles.header}>
         <div className={styles.titleGroup}>
           <h3 className={styles.title}>{title}</h3>

@@ -9,9 +9,9 @@ type KpiGridProps = {
 export function KpiGrid({ metrics }: KpiGridProps) {
   return (
     <div className={styles.grid} role="list" aria-label="Key performance indicators">
-      {metrics.map((metric) => (
+      {metrics.map((metric, index) => (
         <div key={metric.id} role="listitem">
-          <KpiCard metric={metric} />
+          <KpiCard metric={metric} index={index} />
         </div>
       ))}
     </div>

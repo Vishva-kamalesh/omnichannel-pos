@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { DEFAULT_STORE_NAME, MAIN_NAVIGATION, ROUTES } from '@/shared/constants'
 import { useUIStore } from '@/app/store'
 import { useAuthStore } from '@/features/auth'
+import { avatarFallback, avatarImage } from '@/shared/utils/images'
 import styles from './Navbar.module.css'
 
 function getPageTitle(pathname: string): string {
@@ -14,15 +15,6 @@ function getPageTitle(pathname: string): string {
     if (match) return match.label
   }
   return 'Dashboard'
-}
-
-function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('')
 }
 
 function formatRole(role?: string): string {
@@ -40,7 +32,7 @@ export function Navbar() {
 
   const displayName = user?.name ?? 'Guest User'
   const displayRole = formatRole(user?.role)
-  const initials = getInitials(displayName) || 'NA'
+  const avatarSeed = user?.email ?? displayName
 
   function handleLogout() {
     logout()
@@ -86,15 +78,30 @@ export function Navbar() {
           <span className={styles.notificationDot} aria-hidden="true" />
         </button>
 
-        <div className={styles.userBtn} aria-label="Account">
-          <span className={styles.avatar} aria-hidden="true">
-            {initials}
-          </span>
+        <button
+          type="button"
+          className={styles.userBtn}
+          aria-label="View profile"
+          onClick={() => navigate(ROUTES.PROFILE)}
+        >
+          <img
+            className={styles.avatarImg}
+            src={avatarImage(avatarSeed, 52)}
+            alt=""
+            aria-hidden="true"
+            onError={(e) => {
+              // Photo failed → swap to an illustrated avatar (never initials).
+              const img = e.currentTarget
+              if (img.dataset.fallback) return
+              img.dataset.fallback = '1'
+              img.src = avatarFallback(avatarSeed)
+            }}
+          />
           <span className={styles.userMeta}>
             <span className={styles.userName}>{displayName}</span>
             <span className={styles.userRole}>{displayRole}</span>
           </span>
-        </div>
+        </button>
 
         <button
           type="button"

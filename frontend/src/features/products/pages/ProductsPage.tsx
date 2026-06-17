@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { PageShell } from '@/shared/ui/PageShell'
 import { AsyncBoundary } from '@/shared/ui/AsyncBoundary'
+import { TableSkeleton } from '@/shared/ui/Skeleton'
 import { useAsync } from '@/shared/hooks/useAsync'
 import { productsApi } from '../services/productsApi'
 import { ProductsTable, ProductsToolbar } from '../components'
@@ -64,6 +65,7 @@ export function ProductsPage() {
         onRetry={refetch}
         isEmpty={!loading && !error && products.length === 0}
         emptyMessage="No products in the catalog yet."
+        skeleton={<TableSkeleton rows={8} columns={7} />}
       >
         <div className={styles.panel}>
           <ProductsToolbar

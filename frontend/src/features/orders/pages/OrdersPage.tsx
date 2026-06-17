@@ -3,6 +3,8 @@ import { Search } from 'lucide-react'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { PageShell } from '@/shared/ui/PageShell'
 import { AsyncBoundary } from '@/shared/ui/AsyncBoundary'
+import { TableSkeleton } from '@/shared/ui/Skeleton'
+import { DataTable } from '@/shared/ui/DataTable'
 import { useAsync } from '@/shared/hooks/useAsync'
 import { ordersApi } from '../services/ordersApi'
 import styles from './OrdersPage.module.css'
@@ -27,6 +29,19 @@ const STATUS_LABELS: Record<string, { label: string; class: string }> = {
   completed: { label: 'Completed', class: 'badgeCompleted' },
   returned: { label: 'Refunded', class: 'badgeRefunded' },
   cancelled: { label: 'Cancelled', class: 'badgeCancelled' },
+}
+
+/** Display labels for payment methods — keeps "UPI" upper-cased, not "Upi". */
+const PAYMENT_LABELS: Record<string, string> = {
+  cash: 'Cash',
+  card: 'Card',
+  upi: 'UPI',
+  credit: 'Credit',
+}
+
+/** Title-case any status that isn't explicitly mapped above. */
+function capitalize(value: string): string {
+  return value ? value.charAt(0).toUpperCase() + value.slice(1) : value
 }
 
 export function OrdersPage() {
@@ -106,117 +121,129 @@ export function OrdersPage() {
         onRetry={refetch}
         isEmpty={!loading && !error && orders.length === 0}
         emptyMessage="No orders yet. Make a sale from POS to see them here."
+        skeleton={<TableSkeleton rows={8} columns={6} />}
       >
-        <div className={styles.tableWrap}>
-          <div className={styles.scroll}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Order</th>
-                  <th>Cashier · Store</th>
-                  <th>Items</th>
-                  <th>Payment</th>
-                  <th>Status</th>
-                  <th className={styles.numericCol}>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((order) => {
-                  const cashier =
-                    typeof order.cashierId === 'object'
-                      ? order.cashierId?.name
-                      : '—'
-                  const store =
-                    typeof order.storeId === 'object'
-                      ? order.storeId?.name
-                      : '—'
-                  const itemCount = order.items.reduce(
-                    (sum, it) => sum + it.quantity,
-                    0,
-                  )
-                  const statusInfo =
-                    STATUS_LABELS[order.status] ?? {
-                      label: order.status,
-                      class: 'badgeCompleted',
-                    }
-                  return (
-                    <tr key={order._id}>
-                      <td>
-                        <span className={styles.orderNo}>
-                          {order.orderNumber}
-                        </span>
-                        <span className={styles.subText}>
-                          {formatDate(order.createdAt)}
-                        </span>
-                      </td>
-                      <td>
-                        {cashier}
-                        <span className={styles.subText}>{store}</span>
-                      </td>
-                      <td>
-                        {itemCount} item{itemCount !== 1 ? 's' : ''}
-                        <span className={styles.subText}>
-                          {order.items
-                            .slice(0, 2)
-                            .map((it) => it.name)
-                            .join(', ')}
-                          {order.items.length > 2
-                            ? ` +${order.items.length - 2} more`
-                            : ''}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={styles.method}>
-                          {order.paymentMethod}
-                        </span>
-                      </td>
-                      <td>
-                        <span
-                          className={[
-                            styles.badge,
-                            styles[statusInfo.class],
-                          ].join(' ')}
-                        >
-                          {statusInfo.label}
-                        </span>
-                      </td>
-                      <td className={styles.amount}>
-                        {formatINR(order.finalAmount)}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-
-          {pagination ? (
-            <div className={styles.footer}>
-              <span>
-                Showing page {pagination.page} of {pagination.pages} ·{' '}
-                {pagination.total} order{pagination.total !== 1 ? 's' : ''}
-              </span>
-              <div className={styles.pager}>
-                <button
-                  type="button"
-                  className={styles.pagerBtn}
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page <= 1}
-                >
-                  Previous
-                </button>
-                <button
-                  type="button"
-                  className={styles.pagerBtn}
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={pagination.page >= pagination.pages}
-                >
-                  Next
-                </button>
+        <DataTable
+          data={orders}
+          rowKey={(o) => o._id}
+          columns={[
+            {
+              key: 'order',
+              header: 'Order',
+              render: (o) => (
+                <>
+                  <span className={styles.orderNo}>{o.orderNumber}</span>
+                  <span className={styles.subText}>
+                    {formatDate(o.createdAt)}
+                  </span>
+                </>
+              ),
+            },
+            {
+              key: 'cashier',
+              header: 'Cashier · Store',
+              render: (o) => {
+                const cashier =
+                  typeof o.cashierId === 'object' ? o.cashierId?.name : '—'
+                const store =
+                  typeof o.storeId === 'object' ? o.storeId?.name : '—'
+                return (
+                  <>
+                    {cashier}
+                    <span className={styles.subText}>{store}</span>
+                  </>
+                )
+              },
+            },
+            {
+              key: 'items',
+              header: 'Items',
+              render: (o) => {
+                const itemCount = o.items.reduce(
+                  (sum, it) => sum + it.quantity,
+                  0,
+                )
+                return (
+                  <>
+                    {itemCount} item{itemCount !== 1 ? 's' : ''}
+                    <span className={styles.subText}>
+                      {o.items
+                        .slice(0, 2)
+                        .map((it) => it.name)
+                        .join(', ')}
+                      {o.items.length > 2
+                        ? ` +${o.items.length - 2} more`
+                        : ''}
+                    </span>
+                  </>
+                )
+              },
+            },
+            {
+              key: 'payment',
+              header: 'Payment',
+              render: (o) => (
+                <span className={styles.method}>
+                  {PAYMENT_LABELS[o.paymentMethod] ??
+                    capitalize(o.paymentMethod)}
+                </span>
+              ),
+            },
+            {
+              key: 'status',
+              header: 'Status',
+              render: (o) => {
+                const statusInfo =
+                  STATUS_LABELS[o.status] ?? {
+                    label: capitalize(o.status),
+                    class: 'badgeCompleted',
+                  }
+                return (
+                  <span
+                    className={[styles.badge, styles[statusInfo.class]].join(' ')}
+                  >
+                    {statusInfo.label}
+                  </span>
+                )
+              },
+            },
+            {
+              key: 'amount',
+              header: 'Amount',
+              align: 'right',
+              cellClassName: styles.amount,
+              render: (o) => formatINR(o.finalAmount),
+            },
+          ]}
+          footer={
+            pagination ? (
+              <div className={styles.footer}>
+                <span>
+                  Showing page {pagination.page} of {pagination.pages} ·{' '}
+                  {pagination.total} order{pagination.total !== 1 ? 's' : ''}
+                </span>
+                <div className={styles.pager}>
+                  <button
+                    type="button"
+                    className={styles.pagerBtn}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page <= 1}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.pagerBtn}
+                    onClick={() => setPage((p) => p + 1)}
+                    disabled={pagination.page >= pagination.pages}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
-            </div>
-          ) : null}
-        </div>
+            ) : null
+          }
+        />
       </AsyncBoundary>
     </PageShell>
   )

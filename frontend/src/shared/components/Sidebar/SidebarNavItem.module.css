@@ -18,8 +18,22 @@
 }
 
 .active {
+  position: relative;
   background-color: var(--color-bg-sidebar-active);
   color: var(--color-text-sidebar-active);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* 3px orange left border on every active nav item, full height. */
+.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 0;
+  background-color: var(--color-brand-orange);
 }
 
 .active .iconWrap {
@@ -53,6 +67,6 @@
   font-weight: var(--font-weight-semibold);
   line-height: 18px;
   text-align: center;
-  color: var(--color-text-inverse);
-  background-color: var(--color-primary);
+  color: #ffffff;
+  background-color: var(--color-brand-orange);
 }

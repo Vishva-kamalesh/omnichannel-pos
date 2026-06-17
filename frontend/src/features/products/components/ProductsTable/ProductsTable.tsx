@@ -4,6 +4,7 @@ import {
   getColorHex,
   getTotalStock,
   getVariantColors,
+  hasColorHex,
 } from '../../data/productsMock'
 import type { Product } from '../../types/product.types'
 import { ProductStatusBadge } from '../ProductStatusBadge'
@@ -52,7 +53,10 @@ export function ProductsTable({ products, onEdit }: ProductsTableProps) {
         </thead>
         <tbody>
           {products.map((product) => {
-            const colors = getVariantColors(product)
+            // Only keep colors that resolve to a real swatch — skips synthetic
+            // "Default" variants so we never render grey placeholder dots.
+            const colors = getVariantColors(product).filter(hasColorHex)
+            const variantCount = product.variants.length
             const totalStock = getTotalStock(product)
             return (
               <tr key={product.id}>
@@ -79,23 +83,25 @@ export function ProductsTable({ products, onEdit }: ProductsTableProps) {
                 <td>
                   <div className={styles.variants}>
                     <span className={styles.variantCount}>
-                      {product.variants.length} variants
+                      {variantCount} variant{variantCount !== 1 ? 's' : ''}
                     </span>
-                    <div className={styles.swatches}>
-                      {colors.slice(0, MAX_SWATCHES).map((color) => (
-                        <span
-                          key={color}
-                          className={styles.swatch}
-                          style={{ backgroundColor: getColorHex(color) }}
-                          title={color}
-                        />
-                      ))}
-                      {colors.length > MAX_SWATCHES ? (
-                        <span className={styles.swatchMore}>
-                          +{colors.length - MAX_SWATCHES}
-                        </span>
-                      ) : null}
-                    </div>
+                    {colors.length > 0 ? (
+                      <div className={styles.swatches}>
+                        {colors.slice(0, MAX_SWATCHES).map((color) => (
+                          <span
+                            key={color}
+                            className={styles.swatch}
+                            style={{ backgroundColor: getColorHex(color) }}
+                            title={color}
+                          />
+                        ))}
+                        {colors.length > MAX_SWATCHES ? (
+                          <span className={styles.swatchMore}>
+                            +{colors.length - MAX_SWATCHES}
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
                   </div>
                 </td>
                 <td className={styles.alignRight}>

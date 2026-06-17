@@ -8,6 +8,7 @@ export const ROUTES = {
   ORDERS: '/orders',
   ANALYTICS: '/analytics',
   USERS: '/users',
+  PROFILE: '/profile',
 } as const
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES]

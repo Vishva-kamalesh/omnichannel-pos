@@ -1,13 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   AlertCircle,
+  Banknote,
   CheckCircle2,
-  ChevronsUpDown,
-  Pause,
+  CreditCard,
+  Minus,
+  Plus,
   ShoppingCart,
+  Smartphone,
   Trash2,
-  UserRound,
+  Wallet,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import axios from 'axios'
 import { formatINR } from '../../data/posMock'
 import { posApi } from '../../services/posApi'
@@ -16,11 +20,18 @@ import {
   getCartSummary,
   useCartStore,
 } from '../../store/cartStore'
+import type { CartLine } from '../../store/cartStore'
 import type { PaymentMethodId } from '../../types/pos.types'
-import { CartLineItem } from '../CartLineItem'
-import { OrderSummary } from '../OrderSummary'
-import { PaymentMethods } from '../PaymentMethods'
+import { ProductImage } from '../ProductImage'
 import styles from './CartPanel.module.css'
+
+const PAYMENT_METHODS: { id: PaymentMethodId; label: string; icon: LucideIcon }[] =
+  [
+    { id: 'cash', label: 'Cash', icon: Banknote },
+    { id: 'card', label: 'Card', icon: CreditCard },
+    { id: 'upi', label: 'UPI', icon: Smartphone },
+    { id: 'wallet', label: 'Wallet', icon: Wallet },
+  ]
 
 const PAYMENT_LABELS: Record<PaymentMethodId, string> = {
   cash: 'Cash',
@@ -29,7 +40,10 @@ const PAYMENT_LABELS: Record<PaymentMethodId, string> = {
   wallet: 'Wallet',
 }
 
-const PAYMENT_BACKEND_MAP: Record<PaymentMethodId, 'cash' | 'card' | 'upi' | 'credit'> = {
+const PAYMENT_BACKEND_MAP: Record<
+  PaymentMethodId,
+  'cash' | 'card' | 'upi' | 'credit'
+> = {
   cash: 'cash',
   card: 'card',
   upi: 'upi',
@@ -45,6 +59,53 @@ type Receipt = {
 type CartPanelProps = {
   storeId: string
   onCheckoutComplete?: () => void | Promise<void>
+}
+
+/** A single editable line in the running sale. */
+function CartLineRow({ line }: { line: CartLine }) {
+  const increment = useCartStore((s) => s.increment)
+  const decrement = useCartStore((s) => s.decrement)
+  const { product, quantity } = line
+
+  return (
+    <li className={styles.line}>
+      <ProductImage product={product} className={styles.lineImg} />
+      <div className={styles.lineInfo}>
+        <p className={styles.lineName}>{product.name}</p>
+        <p className={styles.lineMeta}>
+          {formatINR(product.price)} · {product.unit}
+        </p>
+        <div className={styles.stepper}>
+          {/* Stepping down from 1 removes the line (the store drops qty 0). */}
+          <button
+            type="button"
+            className={styles.stepBtn}
+            onClick={() => decrement(product.id)}
+            aria-label={
+              quantity === 1
+                ? `Remove ${product.name}`
+                : `Decrease ${product.name}`
+            }
+          >
+            <Minus size={15} strokeWidth={2} />
+          </button>
+          <span className={styles.qty}>{quantity}</span>
+          <button
+            type="button"
+            className={styles.stepBtn}
+            onClick={() => increment(product.id)}
+            disabled={quantity >= product.stock}
+            aria-label={`Increase ${product.name}`}
+          >
+            <Plus size={15} strokeWidth={2} />
+          </button>
+        </div>
+      </div>
+      <span className={styles.lineTotal}>
+        {formatINR(product.price * quantity)}
+      </span>
+    </li>
+  )
 }
 
 export function CartPanel({ storeId, onCheckoutComplete }: CartPanelProps) {
@@ -63,7 +124,7 @@ export function CartPanel({ storeId, onCheckoutComplete }: CartPanelProps) {
   const summary = getCartSummary(lines, discountRate)
   const isEmpty = lines.length === 0
 
-  // Keep the most recently scanned line in view.
+  // Keep the most recently added line in view.
   useEffect(() => {
     const list = listRef.current
     if (list) list.scrollTop = list.scrollHeight
@@ -119,49 +180,37 @@ export function CartPanel({ storeId, onCheckoutComplete }: CartPanelProps) {
   return (
     <section className={styles.panel} aria-label="Current sale">
       <header className={styles.header}>
-        <div className={styles.headerTop}>
-          <div>
-            <h2 className={styles.title}>Current Sale</h2>
-            <p className={styles.orderNo}>Register 02 · Live</p>
-          </div>
-          <button
-            type="button"
-            className={styles.clearBtn}
-            onClick={handleClear}
-            disabled={isEmpty}
-          >
-            <Trash2 size={14} strokeWidth={2} />
-            Clear
-          </button>
+        <div>
+          <h2 className={styles.title}>Current sale</h2>
+          <p className={styles.subtitle}>
+            {isEmpty
+              ? 'Register 02'
+              : `${summary.unitCount} item${summary.unitCount === 1 ? '' : 's'} · Register 02`}
+          </p>
         </div>
-
-        <div className={styles.headerActions}>
-          <button type="button" className={styles.customerBtn}>
-            <UserRound size={15} strokeWidth={2} aria-hidden="true" />
-            <span className={styles.customerName}>Walk-in customer</span>
-            <ChevronsUpDown size={14} strokeWidth={2} aria-hidden="true" />
-          </button>
-          <button type="button" className={styles.holdBtn} disabled={isEmpty}>
-            <Pause size={14} strokeWidth={2} />
-            Hold
-          </button>
-        </div>
+        <button
+          type="button"
+          className={styles.clearBtn}
+          onClick={handleClear}
+          disabled={isEmpty}
+        >
+          <Trash2 size={14} strokeWidth={2} />
+          Clear
+        </button>
       </header>
 
       {isEmpty ? (
         receipt ? (
           <div className={styles.state}>
             <span className={styles.receiptIcon}>
-              <CheckCircle2 size={26} strokeWidth={2} aria-hidden="true" />
+              <CheckCircle2 size={28} strokeWidth={2} aria-hidden="true" />
             </span>
             <p className={styles.stateTitle}>Payment received</p>
             <p className={styles.receiptMeta}>
               {receipt.orderNo} · {formatINR(receipt.total)} ·{' '}
               {PAYMENT_LABELS[receipt.method]}
             </p>
-            <p className={styles.stateHint}>
-              Receipt sent to the counter printer.
-            </p>
+            <p className={styles.stateHint}>Receipt sent to the counter printer.</p>
             <button
               type="button"
               className={styles.newSaleBtn}
@@ -173,18 +222,18 @@ export function CartPanel({ storeId, onCheckoutComplete }: CartPanelProps) {
         ) : (
           <div className={styles.state}>
             <span className={styles.emptyIcon}>
-              <ShoppingCart size={26} strokeWidth={1.75} aria-hidden="true" />
+              <ShoppingCart size={28} strokeWidth={1.75} aria-hidden="true" />
             </span>
             <p className={styles.stateTitle}>Cart is empty</p>
             <p className={styles.stateHint}>
-              Scan a barcode or tap a product to start the sale.
+              Tap a product or search to start the sale.
             </p>
           </div>
         )
       ) : (
         <ul className={styles.list} ref={listRef}>
           {lines.map((line) => (
-            <CartLineItem key={line.product.id} line={line} />
+            <CartLineRow key={line.product.id} line={line} />
           ))}
         </ul>
       )}
@@ -212,7 +261,54 @@ export function CartPanel({ storeId, onCheckoutComplete }: CartPanelProps) {
           </div>
         </div>
 
-        <OrderSummary summary={summary} />
+        <dl className={styles.summary}>
+          <div className={styles.summaryRow}>
+            <dt>Subtotal</dt>
+            <dd>{formatINR(summary.subtotal)}</dd>
+          </div>
+          {summary.discountAmount > 0 ? (
+            <div className={styles.summaryRow}>
+              <dt>Discount ({summary.discountRate}%)</dt>
+              <dd className={styles.summaryNeg}>
+                −{formatINR(summary.discountAmount)}
+              </dd>
+            </div>
+          ) : null}
+          <div className={styles.summaryRow}>
+            <dt>Tax (GST)</dt>
+            <dd>{formatINR(summary.taxAmount)}</dd>
+          </div>
+          <div className={[styles.summaryRow, styles.summaryTotal].join(' ')}>
+            <dt>Total</dt>
+            <dd>{formatINR(summary.total)}</dd>
+          </div>
+        </dl>
+
+        <div className={styles.payment}>
+          <span className={styles.paymentLabel}>Payment method</span>
+          <div className={styles.methods}>
+            {PAYMENT_METHODS.map(({ id, label, icon: Icon }) => {
+              const isActive = id === payment
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  aria-pressed={isActive}
+                  className={[
+                    styles.method,
+                    isActive ? styles.methodActive : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  onClick={() => setPayment(id)}
+                >
+                  <Icon size={20} strokeWidth={2} aria-hidden="true" />
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
 
         {checkoutError ? (
           <div className={styles.checkoutError} role="alert">
@@ -221,13 +317,20 @@ export function CartPanel({ storeId, onCheckoutComplete }: CartPanelProps) {
           </div>
         ) : null}
 
-        <PaymentMethods
-          selected={payment}
-          onSelect={setPayment}
-          total={summary.total}
+        <button
+          type="button"
+          className={[styles.checkout, isEmpty ? styles.checkoutEmpty : '']
+            .filter(Boolean)
+            .join(' ')}
+          onClick={handleCheckout}
           disabled={isEmpty || submitting}
-          onCheckout={handleCheckout}
-        />
+        >
+          {submitting
+            ? 'Processing…'
+            : isEmpty
+              ? 'Add items to checkout'
+              : `Charge ${formatINR(summary.total)}`}
+        </button>
       </footer>
     </section>
   )

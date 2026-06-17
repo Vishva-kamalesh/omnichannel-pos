@@ -6,8 +6,20 @@
   align-items: flex-start;
   justify-content: center;
   padding: var(--space-6) var(--space-4);
-  background-color: rgba(15, 23, 42, 0.45);
+  background-color: rgba(0, 0, 0, 0.6);
   overflow-y: auto;
+  /* The modal is portaled to <body>, OUTSIDE the DashboardLayout dark scope,
+     so it would otherwise inherit the light :root tokens and render as a light
+     dialog over the dark app. Re-apply the dark palette here so token-based
+     children (inputs, borders, text) match the rest of the product. */
+  --color-bg-app: #15151f;
+  --color-bg-surface: #1e1e2e;
+  --color-bg-elevated: #232334;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-muted: rgba(255, 255, 255, 0.55);
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
 }
 
 .dialog {

@@ -14,6 +14,7 @@ export function LowStockAlerts({ items }: LowStockAlertsProps) {
     <DashboardPanel
       title="Low stock alerts"
       meta={`${criticalCount} critical`}
+      dark
       actions={
         <button type="button" className={styles.viewAll}>
           View all

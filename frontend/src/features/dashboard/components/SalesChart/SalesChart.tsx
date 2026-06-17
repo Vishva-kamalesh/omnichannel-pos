@@ -39,33 +39,36 @@ export function SalesChart({ data }: SalesChartProps) {
   return (
     <div className={styles.chart}>
       <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={data} margin={{ top: 4, right: 4, left: -18, bottom: 0 }}>
+        <BarChart data={data} margin={{ top: 4, right: 4, left: 0, bottom: 0 }}>
+          {/* Dark-theme palette: faint white grid, legible white-ish axis
+             labels, and the brand-orange bar (the old steel #295e8c was
+             nearly invisible on the #15151f surface). */}
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="#e5e7eb"
+            stroke="rgba(255, 255, 255, 0.08)"
             vertical={false}
           />
           <XAxis
             dataKey="label"
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 11, fill: '#6b7280' }}
+            tick={{ fontSize: 11, fill: 'rgba(255, 255, 255, 0.6)' }}
             dy={6}
           />
           <YAxis
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 10, fill: '#9ca3af' }}
+            tick={{ fontSize: 10, fill: 'rgba(255, 255, 255, 0.5)' }}
             tickFormatter={(v) => formatINR(Number(v), true)}
             width={52}
           />
           <Tooltip
             content={<ChartTooltip />}
-            cursor={{ fill: 'rgba(41, 94, 140, 0.08)' }}
+            cursor={{ fill: 'rgba(244, 98, 42, 0.12)' }}
           />
           <Bar
             dataKey="sales"
-            fill="#295e8c"
+            fill="#f4622a"
             radius={[3, 3, 0, 0]}
             maxBarSize={40}
           />

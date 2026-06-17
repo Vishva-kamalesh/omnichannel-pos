@@ -17,7 +17,7 @@ export function RecentTransactionsTable({
   transactions,
 }: RecentTransactionsTableProps) {
   return (
-    <DashboardPanel title="Recent transactions" meta="Live feed" noPadding>
+    <DashboardPanel title="Recent transactions" meta="Live feed" noPadding dark>
       <div className={styles.tableWrap}>
         <table className={styles.table}>
           <thead>

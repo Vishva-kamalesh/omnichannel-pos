@@ -20,6 +20,24 @@ function formatINR(value: number): string {
   return `₹${value.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
 }
 
+/** Turn an ISO bucket key into a short axis label: "2026-05-16" → "May 16". */
+function formatAxisDate(value: string): string {
+  const parts = String(value).split('-')
+  if (parts.length >= 3) {
+    const date = new Date(`${value}T00:00:00`)
+    if (!Number.isNaN(date.getTime())) {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    }
+  }
+  if (parts.length === 2) {
+    const date = new Date(`${value}-01T00:00:00`)
+    if (!Number.isNaN(date.getTime())) {
+      return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    }
+  }
+  return value
+}
+
 function SalesCard() {
   const [type, setType] = useState<'daily' | 'weekly' | 'monthly'>('weekly')
   const { data, loading, error, status, refetch } = useAsync<SalesPoint[]>(
@@ -68,17 +86,33 @@ function SalesCard() {
       >
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => formatINR(v)} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+            <XAxis
+              dataKey="date"
+              tickFormatter={formatAxisDate}
+              tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.55)' }}
+              stroke="rgba(255,255,255,0.15)"
+            />
+            <YAxis
+              tick={{ fontSize: 11, fill: 'rgba(255,255,255,0.55)' }}
+              stroke="rgba(255,255,255,0.15)"
+              tickFormatter={(v) => formatINR(v)}
+            />
             <Tooltip
+              cursor={{ fill: 'rgba(255,255,255,0.06)' }}
+              contentStyle={{
+                backgroundColor: '#1e1e2e',
+                border: '1px solid rgba(255,255,255,0.12)',
+                borderRadius: 8,
+                color: '#ffffff',
+              }}
               formatter={(value, name) =>
                 name === 'sales'
                   ? [formatINR(Number(value)), 'Sales']
                   : [String(value), 'Orders']
               }
             />
-            <Bar dataKey="sales" fill="#295e8c" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="sales" fill="#f4622a" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </AsyncBoundary>

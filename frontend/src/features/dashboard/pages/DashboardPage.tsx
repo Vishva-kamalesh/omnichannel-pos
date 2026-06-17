@@ -1,4 +1,3 @@
-import { PageHeader } from '@/shared/ui/PageHeader'
 import { PageShell } from '@/shared/ui/PageShell'
 import { AsyncBoundary } from '@/shared/ui/AsyncBoundary'
 import { useAsync } from '@/shared/hooks/useAsync'
@@ -20,6 +19,15 @@ function formatToday(): string {
   })
 }
 
+/** Time-of-day greeting based on the current hour. */
+function getGreeting(): string {
+  const hour = new Date().getHours()
+  if (hour >= 5 && hour < 12) return 'Good morning'
+  if (hour >= 12 && hour < 17) return 'Good afternoon'
+  if (hour >= 17 && hour < 21) return 'Good evening'
+  return 'Good night'
+}
+
 export function DashboardPage() {
   const { data, loading, error, status, refetch } = useAsync(
     () => dashboardApi.loadDashboard(),
@@ -28,22 +36,22 @@ export function DashboardPage() {
 
   return (
     <PageShell>
-      <PageHeader
-        title="Analytics"
-        description={`${formatToday()} · All locations · INR`}
-        descriptionMono
-        actions={
-          <div className={styles.headerActions}>
-            <button
-              type="button"
-              className={styles.exportBtn}
-              onClick={() => refetch()}
-            >
-              Refresh
-            </button>
-          </div>
-        }
-      />
+      <header className={styles.dashHeader}>
+        <div className={styles.dashHeadText}>
+          <h1 className={styles.welcomeTitle}>{getGreeting()}, Admin</h1>
+          <p className={styles.welcomeSub}>
+            Here's how every store is performing today.
+          </p>
+          <p className={styles.metaLine}>{`${formatToday()} · All locations · INR`}</p>
+        </div>
+        <button
+          type="button"
+          className={styles.exportBtn}
+          onClick={() => refetch()}
+        >
+          Refresh
+        </button>
+      </header>
 
       <AsyncBoundary loading={loading} error={error} status={status} onRetry={refetch}>
         {data ? (

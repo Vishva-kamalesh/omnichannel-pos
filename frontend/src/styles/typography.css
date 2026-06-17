@@ -7,10 +7,10 @@ h4 {
   letter-spacing: -0.02em;
 }
 
-/* Operational metadata: monospace all data-table column headers. */
-th {
-  font-family: var(--font-mono);
-}
+/* Column headers stay in the UI sans for scannability. They already read as
+   "labels" via uppercase + letter-spacing in each table; stacking monospace on
+   top of that hurt legibility. Data cells that want mono opt in explicitly
+   (e.g. order numbers, SKUs) with var(--font-mono). */
 
 .pageTitle {
   font-size: var(--font-size-xl);

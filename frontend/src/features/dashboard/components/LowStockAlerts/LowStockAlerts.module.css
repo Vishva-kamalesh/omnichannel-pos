@@ -39,13 +39,13 @@
 }
 
 .critical {
-  color: var(--color-danger);
-  background-color: #fef2f2;
+  color: #f87171;
+  background-color: rgba(239, 68, 68, 0.16);
 }
 
 .warning {
-  color: var(--color-warning);
-  background-color: #fffbeb;
+  color: #fbbf24;
+  background-color: rgba(245, 158, 11, 0.16);
 }
 
 .content {
